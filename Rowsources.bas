@@ -2,6 +2,7 @@ Attribute VB_Name = "Rowsources"
 Option Compare Database
 Option Explicit
 
+'	This class carries a collection of rowsource sql statements for UI controls.
 
 Public Function rsCategories(filters As Collection) As String
 ' This method returns a rowsource for UI.
