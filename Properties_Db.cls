@@ -74,11 +74,11 @@ Public Function getPropertyTypeName(propertyType As String, language As String) 
    Dim sql  As String
    Dim rst  As New ADODB.Recordset
    
-   sql = "SELECT * " & _
+   sql = "SELECT Id, [Language], LookupText, LineOrder " & _
          "FROM " & PROPERTY_TYPE & _
-         " WHERE Id = '" & propertyType & "' AND Language = '" & language & "'"
+         " WHERE Id = '" & propertyType & "' AND [Language] = '" & language & "'"
          
-   rst.Open sql, dbconn, adOpenDynamic, adLockPessimistic
+   rst.Open sql, dbconn, adOpenForwardOnly, adLockPessimistic
    
    getPropertyTypeName = rst!LookupText
    

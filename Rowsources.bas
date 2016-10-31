@@ -2,7 +2,7 @@ Attribute VB_Name = "Rowsources"
 Option Compare Database
 Option Explicit
 
-'	This class carries a collection of rowsource sql statements for UI controls.
+'       This class carries a collection of rowsource sql statements for UI controls.
 '
 
 Public Function rsCategories(filters As Collection) As String
@@ -37,6 +37,23 @@ Public Function rsCategories(filters As Collection) As String
    sql = sql & where & " ORDER BY n.Text"
 
    rsCategories = sql
+   
+End Function
+
+
+Public Function rsDocumentReferences(entityCode As String, versionNro As String) As String
+' Return document references of this entity version ordered by language and type
+
+   Dim sql As String
+   
+   sql = "SELECT dr.Id, dt.TypeName AS [Document type], dr.DocumentName AS [Document name] " & _
+         "FROM (" & DOC_REFERENCE & " AS dr " & _
+         "INNER JOIN " & DOC_TYPE & " AS dt ON (dr.DocumentType_Id = dt.Id AND dr.Language = dt.Language)) " & _
+         "INNER JOIN " & ITEM_VERSION & " AS v ON v.Id = dr.ItemVersion_Id " & _
+         "WHERE v.Item_Code = '" & entityCode & "' AND v.VersionNumber = '" & versionNro & "' " & _
+         "ORDER BY dr.Language DESC, dr.DocumentType_Id"
+      
+   rsDocumentReferences = sql
    
 End Function
 

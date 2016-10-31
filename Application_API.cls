@@ -10,15 +10,18 @@ Attribute VB_Exposed = False
 Option Compare Database
 Option Explicit
 
-Public Function Entities() As Entities
 
-   Dim newEntities   As Entities
+Public Function Documents() As Documents
    
-   Set newEntities = New Entities
-   Call newEntities.init
+   Set Documents = New Documents
+   Call Documents.init
+      
+End Function
+Public Function Entities() As Entities
    
-   Set Entities = newEntities
-   
+   Set Entities = New Entities
+   Call Entities.init
+      
 End Function
 
 
@@ -30,13 +33,8 @@ End Function
 
 Public Function Descriptions() As Descriptions
 
-   Dim newDescriptions  As Descriptions
-   
-   Set newDescriptions = New Descriptions
-   Call newDescriptions.init
-   
-   Set Descriptions = newDescriptions
-   Set newDescriptions = Nothing
+   Set Descriptions = New Descriptions
+   Call Descriptions.init
    
 End Function
 
@@ -50,11 +48,7 @@ End Function
 
 Public Function Decisions() As Decisions
 
-   Dim newDecisions  As Decisions
-   Set newDecisions = New Decisions
-   Call newDecisions.init
-   
-   Set Decisions = newDecisions
-   Set newDecisions = Nothing
+   Set Decisions = New Decisions
+   Call Decisions.init
    
 End Function
