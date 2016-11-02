@@ -11,9 +11,10 @@ Option Compare Database
 Option Explicit
 
 ' Instantiated Entity is always an entity + version object pair.
-' Data that is associated with entity is handled here.
-' Data that is associated with version is passed to version object.
-
+' Calls that are associated with entity data itself use methods here.
+' Calls that are associated with entity related objects are delegated to public repositories.
+' These calls are of form Entity.Documents.getDocument(docId).
+  
 Private app             As Application_API
 Private oCode           As String
 Private oType           As String
@@ -23,12 +24,14 @@ Private oProperties     As Properties
 Private oVersionNro     As String
 Private oNew            As Boolean
 
+Public Documents		As Documents
 
 Public Sub init(entityCode As String, entityType As String, versionNro As String, nameBehavior As Names_IF, ownerBehavior As Owners_IF)
    
    Set app = New Application_API
    Set oNames = nameBehavior
    Set oOwners = ownerBehavior
+   set Documents = new Documents
    oCode = entityCode
    oType = entityType
    oVersionNro = versionNro
@@ -44,6 +47,8 @@ Public Function getCode() As String
    getCode = oCode
    
 End Function
+
+
 Public Function getType() As String
 
    getType = oType
@@ -115,12 +120,6 @@ Public Function getLastDecision() As Decision
 End Function
 
 
-Public Function getDocument(docId As Long) As Document
-' Return a document object to the client
-
-   Set getDocument = app.Documents.getDocument(docId)
-   
-End Function
 Public Sub setDecision(objDecision As Decision)
 
    Call app.Decisions.saveDecision(oCode, oVersionNro, objDecision)

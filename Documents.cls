@@ -13,23 +13,46 @@ Option Explicit
 ' Class Documents; gets document references and associates entities with
 ' documents
 
-Private db     As ADODB.Connection
+Private db     As Documents_Db
+
 
 Public Sub init()
    
-   Set db = CurrentProject.Connection
+   Set db = new Documents_Db
    
 End Sub
+
+
 
 Public Function getDocument(docId As Long) As Document
 ' Return a document reference object
 
-   Dim sql     As String
-   Dim rst     As ADODB.Recordset
+   Dim docRst     As ADODB.Recordset
+   dim docRef	  as Documents
    
-   Set getDocument = New Document
+   set docRst = db.getDocument(docId)
+   set docRef = new Documents
+   
+   if docRst.EOF Then Err.Raise (recordNotFound,,"Document reference not found")
+   
+   with docRst
+   		docRef.setId(!Id)
+   		docRef.setType(!Type)
+   		docRef.setName(!DocName)
+   		docRef.setLanguage(!Lang)
+   		docRef.setURL(!URL)
+   		docRef.isPersistent = true
+   		docRef.isModified = false
+   	end with
+   			
+   Set getDocument = docRef
+   
+   set docRst = nothing
+   set docRef = nothing
    
 End Function
+
+
 
 Public Function createDocReference() As Document
 

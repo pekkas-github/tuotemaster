@@ -60,6 +60,7 @@ Public lang             As String       ' Selected translation of product data (
    Enum e
       notUniqueName = vbObjectError + 1000
       actionNotAllowed = vbObjectError + 1001
+      recordNotFound = vbObjectError + 1002
    End Enum
     
 '   Filter attributes in queries
