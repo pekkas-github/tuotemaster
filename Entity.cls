@@ -115,6 +115,12 @@ Public Function getLastDecision() As Decision
 End Function
 
 
+Public Function getDocument(docId As Long) As Document
+' Return a document object to the client
+
+   Set getDocument = app.Documents.getDocument(docId)
+   
+End Function
 Public Sub setDecision(objDecision As Decision)
 
    Call app.Decisions.saveDecision(oCode, oVersionNro, objDecision)
