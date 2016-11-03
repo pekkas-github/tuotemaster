@@ -24,14 +24,14 @@ Private oProperties     As Properties
 Private oVersionNro     As String
 Private oNew            As Boolean
 
-Public Documents		As Documents
+Public Documents       As Documents
 
 Public Sub init(entityCode As String, entityType As String, versionNro As String, nameBehavior As Names_IF, ownerBehavior As Owners_IF)
    
    Set app = New Application_API
    Set oNames = nameBehavior
    Set oOwners = ownerBehavior
-   set Documents = new Documents
+   Set Documents = New Documents
    oCode = entityCode
    oType = entityType
    oVersionNro = versionNro

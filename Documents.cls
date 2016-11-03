@@ -6,7 +6,7 @@ Attribute VB_Name = "Documents"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
-Attribute VB_Exposed = False
+Attribute VB_Exposed = True
 Option Compare Database
 Option Explicit
 
@@ -18,7 +18,7 @@ Private db     As Documents_Db
 
 Public Sub init()
    
-   Set db = new Documents_Db
+   Set db = New Documents_Db
    
 End Sub
 
@@ -28,27 +28,27 @@ Public Function getDocument(docId As Long) As Document
 ' Return a document reference object
 
    Dim docRst     As ADODB.Recordset
-   dim docRef	  as Documents
+   Dim docRef     As Document
    
-   set docRst = db.getDocument(docId)
-   set docRef = new Documents
+   Set docRst = db.getDocument(docId)
+   Set docRef = New Document
    
-   if docRst.EOF Then Err.Raise (recordNotFound,,"Document reference not found")
+   If docRst.EOF Then Err.Raise recordnotfound, , "Document reference not found"
    
-   with docRst
-   		docRef.setId(!Id)
-   		docRef.setType(!Type)
-   		docRef.setName(!DocName)
-   		docRef.setLanguage(!Lang)
-   		docRef.setURL(!URL)
-   		docRef.isPersistent = true
-   		docRef.isModified = false
-   	end with
-   			
+   With docRst
+                docRef.setId (docId)
+                docRef.setType (!DocumentType_id)
+                docRef.setName (!DocumentName)
+                docRef.setLanguage (!language)
+                docRef.setURL (!URL)
+                docRef.isPersistent = True
+                docRef.isModified = False
+        End With
+                        
    Set getDocument = docRef
    
-   set docRst = nothing
-   set docRef = nothing
+   Set docRst = Nothing
+   Set docRef = Nothing
    
 End Function
 
