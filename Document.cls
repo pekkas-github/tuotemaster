@@ -20,6 +20,12 @@ Private oURL         As String
 Private oPersistent  As Boolean
 Private oModified    As Boolean
 
+public sub init(docType as string)
+		
+	
+end sub
+
+
 Public Function openDocument() As Boolean
 ' Open the actual document that this object refers to.
 ' Return false value, if document is not found from URL location.

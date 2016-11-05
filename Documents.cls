@@ -36,14 +36,14 @@ Public Function getDocument(docId As Long) As Document
    If docRst.EOF Then Err.Raise recordnotfound, , "Document reference not found"
    
    With docRst
-                docRef.setId (docId)
-                docRef.setType (!DocumentType_id)
-                docRef.setName (!DocumentName)
-                docRef.setLanguage (!language)
-                docRef.setURL (!URL)
-                docRef.isPersistent = True
-                docRef.isModified = False
-        End With
+        docRef.setId (docId)
+        docRef.setType (!DocumentType_id)
+        docRef.setName (!DocumentName)
+        docRef.setLanguage (!language)
+        docRef.setURL (!URL)
+        docRef.isPersistent = True
+        docRef.isModified = False
+   End With
                         
    Set getDocument = docRef
    
@@ -56,7 +56,16 @@ End Function
 
 Public Function createDocReference() As Document
 
-   Set createDocReference = New Document
+	dim docRef	as Document
+	
+	set docRef= new Document
+	
+	with docRef
+
+	End With
+
+   Set createDocReference = docRef
+   set docRef=nothing
    
 End Function
 
