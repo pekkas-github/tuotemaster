@@ -56,16 +56,16 @@ End Function
 
 Public Function createDocReference() As Document
 
-	dim docRef	as Document
-	
-	set docRef= new Document
-	
-	with docRef
+        Dim docRef      As Document
+        
+        Set docRef = New Document
+        
+        With docRef
 
-	End With
+        End With
 
    Set createDocReference = docRef
-   set docRef=nothing
+   Set docRef = Nothing
    
 End Function
 

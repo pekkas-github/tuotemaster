@@ -2,43 +2,8 @@ Attribute VB_Name = "Rowsources"
 Option Compare Database
 Option Explicit
 
-'       This class carries a collection of rowsource sql statements for UI controls.
-'
-
-Public Function rsCategories(filters As Collection) As String
-' This method returns a rowsource for UI.
-' It shows a list of (last versions of the) categories
-' There is a subquery sqlLastVesions to filter out only the
-' latest versions (basically there doesn't exist versions)
-
-   Dim sql     As String
-   Dim where   As String
-   
-   sql = "SELECT i.Code, n.Text AS Name, sn.Text AS Status, p.PersonName AS Owner " & _
-         "FROM (((((((" & ITEM_VERSION & " AS v " & _
-         "INNER JOIN (" & sqlLastVersions & ") AS v1 ON v.Id = v1.Id) " & _
-         "INNER JOIN " & VERSION_STATUS & " AS s ON v.Id = s.ItemVersion_Id) " & _
-         "INNER JOIN " & STATUS_NAME & " AS sn ON sn.Id = s.StatusName_Id) " & _
-         "INNER JOIN " & CORE_ITEM & " AS i ON i.Code = v.Item_Code) " & _
-         "INNER JOIN " & ITEM_NAME & " AS n ON i.Code = n.Item_Code) " & _
-         "INNER JOIN " & ITEM_OWNER & " AS o ON i.Code = o.Item_Code) " & _
-         "INNER JOIN " & PARTY & " AS p ON p.Id = o.Party_Id) " & _
-         "WHERE n.Lang_Code = '" & Globals.lang & "' AND sn.Lang_Code = '" & Globals.lang & "' " & _
-              "AND o.Valid_From <= " & TODAY & " AND o.Valid_To > " & TODAY & _
-              " AND s.Valid_From <=" & TODAY & " AND s.Valid_To > " & TODAY & _
-              " AND i.Type = 'CAT'"
-         
-'  Check filters
-   'Don't show "Deleted" and (optionaly) "Terminated"
-   If Not filters("All") Then
-       where = where & " AND NOT (s.StatusName_Id = 4 OR s.StatusName_Id = 9) "
-   End If
-
-   sql = sql & where & " ORDER BY n.Text"
-
-   rsCategories = sql
-   
-End Function
+' This class carries a collection of those rowsource sql statements that are used in several forms.
+' Form specific rowsources are defined on each form itself.
 
 
 Public Function rsDocumentReferences(entityCode As String, versionNro As String) As String
@@ -373,80 +338,9 @@ Public Function rsValidPropertyValues(entityType As String, propertyType As Stri
    
 End Function
 
-Public Function rsSalesItems(productCode As String) As String
-
-    Dim sql     As String
-    
-    sql = "SELECT i.Code, n.Text AS Name, v.VersionNumber AS Version, sn.Text AS Status " & _
-          "FROM (((( " & CORE_ITEM & " AS i " & _
-          "INNER JOIN " & ITEM_NAME & " AS n ON i.Code = n.Item_Code) " & _
-          "INNER JOIN " & ITEM_VERSION & " AS v ON i.Code = v.Item_Code) " & _
-          "INNER JOIN " & VERSION_STATUS & " AS s ON v.Id = s.ItemVersion_Id) " & _
-          "INNER JOIN " & STATUS_NAME & " AS sn ON sn.Id = s.StatusName_Id) " & _
-          "INNER JOIN " & GROUP_HIERARCHY & " AS g ON i.Code = g.Child_Code " & _
-          "WHERE n.Lang_Code = '" & lang & "' AND sn.Lang_Code = '" & lang & "' " & _
-             "AND s.Valid_From <= " & TODAY & " AND s.Valid_To > " & TODAY & _
-             " AND g.Parent_Code = '" & productCode & "' " & _
-         "ORDER BY n.Text"
-
-   rsSalesItems = sql
-   
-End Function
 
 
-Public Function rsMemberInCategories(childCode As String) As String
-' A rowsource that provides all reverse category paths from an entity to the top level category
-' The rowsource is a value chain and its format is
-'  "CAT000001; cat_1 > group_a > group_b; CAT000002; cat_2 > group_c; " etc.
 
-   Dim db            As ADODB.Connection
-   Dim parentCodes   As New ADODB.Recordset
-   Dim sql           As String
-   Dim rowSource     As String
-   
-   Set db = CurrentProject.Connection
-   rowSource = "Category;Path;"
-   
-   sql = "SELECT Parent_Code FROM " & GROUP_HIERARCHY & " WHERE Child_Code = '" & childCode & "'"
-   
-   parentCodes.Open sql, db, adOpenDynamic, adLockPessimistic
-   
-   While Not parentCodes.EOF
-      rowSource = rowSource & getSinglePath(parentCodes!Parent_Code) & ";"
-      parentCodes.MoveNext
-   Wend
-   
-   rsMemberInCategories = rowSource
-   
-   Set parentCodes = Nothing
-   Set db = Nothing
-   
-End Function
-
-Private Function getSinglePath(childCode As String) As String
-' Create a reverese group hierarchy path of a child group.
-' Assumption is that each subgroup has only one parent.
-' Format is "CAT > subGroup > subGroup etc."
-
-   Dim db            As ADODB.Connection
-   Dim parentItem    As New ADODB.Recordset
-   Dim sqlParent     As String
-   Dim thisItemName  As String
-   
-   Set db = CurrentProject.Connection
-   
-   sqlParent = "SELECT Parent_Code, Parent_Type FROM " & GROUP_HIERARCHY & " WHERE Child_Code = '" & childCode & "'"
-                    
-   parentItem.Open sqlParent, db, adOpenDynamic, adLockPessimistic
-   
-   If parentItem!Parent_Type = "ROOT" Then
-      getSinglePath = DLookup("Text", ITEM_NAME, "Item_Code = '" & childCode & "' AND Lang_Code = '" & lang & "'") & ";"
-   Else
-      thisItemName = DLookup("Text", ITEM_NAME, "Item_Code = '" & childCode & "' AND Lang_Code = '" & lang & "'")
-      getSinglePath = getSinglePath(parentItem!Parent_Code) & " --> " & thisItemName
-   End If
-   
-End Function
 
 Public Function rsDecisions(entityCode As String, versionNro As String) As String
 

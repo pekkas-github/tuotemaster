@@ -39,7 +39,7 @@ Public Function getDocument(docId As Long) As ADODB.Recordset
 End Function
 
 
-Public Function insertDocumentReference(entityVersion As Long, documentRef As DocumentReference) As Long
+Public Function insertDocumentReference(entityVersion As Long, documentRef As Document) As Long
 ' CREATED in ver 6.3.0
 
    Dim rst As New ADODB.Recordset
@@ -61,7 +61,7 @@ Public Function insertDocumentReference(entityVersion As Long, documentRef As Do
 End Function
 
 
-Public Sub updateDocumentReference(entityVersion As Long, documentRef As DocumentReference)
+Public Sub updateDocumentReference(entityVersion As Long, documentRef As Document)
 ' CREATED in ver 6.3.0
 
    Dim rst As New ADODB.Recordset

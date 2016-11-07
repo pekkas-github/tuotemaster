@@ -60,6 +60,25 @@ Public Sub InsertInGroupHierarchy(ChildEntity As Object, ParentEntity As Object)
 End Sub
 
 
+Public Sub DeleteFromGroupHierarchy(ChildEntity As Object, ParentEntity As Object)
+'   Cut the parent-child connection. Child branch stays orphan unless it is later
+'   connected to another parent group. Orphan groups are cleaned by garbage collection
+'   in "DeleteOrphanGroupings"
+
+    Dim rst As New ADODB.Recordset
+    Dim sql As String
+    
+    sql = "SELECT * FROM GroupHierarchy " & _
+          "WHERE Child_Code = '" & ChildEntity.code & "' AND Parent_Code = '" & ParentEntity.code & "'"
+          
+    rst.Open sql, dbconn, , adLockPessimistic
+    rst.Delete
+    rst.Update
+
+    Set rst = Nothing
+
+End Sub
+
 Private Sub Class_Terminate()
 
    Set dbconn = Nothing

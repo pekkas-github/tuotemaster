@@ -18,7 +18,7 @@ Option Explicit
 ' Orvoiksi j‰‰neet entiteetit siivotaan TOOLS-tyˆkalulla.
 '**
 
-Private Data               As GroupMapper_Db
+Private Data                As GroupMapper_Db
 Private thisClipBoard       As Collection     ' Leikepˆyt‰ kopioitujen/leikattujen ryhm‰hierarkioiden tilap‰iseen tallettamiseeen
 Private thisCutPending      As Boolean        ' Tyˆpˆyd‰ll‰ on kopioituja/leikattuja ryhm‰hierarkioita
 
@@ -31,13 +31,13 @@ Public Sub Copy(ChildEntities As Collection)
     
 End Sub
 
-Public Sub Cut(ParentEntity As Entity, ChildEntities As Collection)
+Public Sub Cut(ParentEntity As entity, ChildEntities As Collection)
 '   Irrotetaan is‰nt‰ryhm‰st‰ kaikki kokoelmassa olevat lapset. Is‰nt‰ voi olla ROOT, CAT tai GRP.
 '   Lapset voivat olla mit‰ tahansa tyyppi‰. Onnistuneesti irrotetut lapset j‰‰v‰t muistiin, kunnes
 '       a) tehd‰‰n uusi leikkaus/kopiointi (joukko j‰‰ orvoksi -> garbage collection)
 '       b) GroupMapper terminoituu (joukko j‰‰ orvoksi -> garbage collection)
 
-    Dim ChildEntity As Entity
+    Dim ChildEntity As entity
     
     thisCutPending = True
     Set thisClipBoard = New Collection
@@ -49,19 +49,19 @@ Public Sub Cut(ParentEntity As Entity, ChildEntities As Collection)
             
 End Sub
 
-Public Sub UnMap(ChildEntity As Entity, ParentEntity As Entity)
+Public Sub UnMap(ChildEntity As entity, ParentEntity As entity)
 '   Disconnect this child entity from its parent entity
 
     Call Data.DeleteFromGroupHierarchy(ChildEntity, ParentEntity)
     
 End Sub
 
-Public Sub Paste(ParentEntity As Entity)
+Public Sub Paste(ParentEntity As entity)
 '   Liitet‰‰n aikaisemmin kopioitu/leikattu lapsijoukko valittuun is‰nt‰‰n.
 '   Liitt‰misen j‰lkeen lapsikokoelmaa ei tyhjennet‰, jotta se voidaan liitt‰‰
 '   useampaan is‰nt‰‰n.
 
-    Dim ChildEntity As Entity
+    Dim ChildEntity As entity
     Dim ParentType  As String
     Dim ChildType   As String
     
@@ -100,7 +100,7 @@ Private Function isMappingOk(ParentType As String, ChildType As String) As Boole
     
 End Function
 
-Public Sub Map(ChildEntity As Entity, ParentEntity As Entity)
+Public Sub Map(ChildEntity As entity, ParentEntity As entity)
 '   Connect the child entity under the selected entity
     
     'If item is already mapped then skip

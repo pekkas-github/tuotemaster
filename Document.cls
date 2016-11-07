@@ -20,10 +20,10 @@ Private oURL         As String
 Private oPersistent  As Boolean
 Private oModified    As Boolean
 
-public sub init(docType as string)
-		
-	
-end sub
+Public Sub init(docType As String)
+                
+        
+End Sub
 
 
 Public Function openDocument() As Boolean
