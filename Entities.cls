@@ -24,7 +24,7 @@ Public Sub init()
 End Sub
 
 
-Public Function createEntity(entityType As String, Optional versionNumber As String = "1.0") As entity
+Public Function createEntity(entityType As String, Optional VersionNumber As String = "1.0") As entity
 ' Create and save a new entity and a version associated with it. Default version number is 1.0.
 ' Saving creates the code for the entity and its repositories can be created
 
@@ -38,10 +38,10 @@ Public Function createEntity(entityType As String, Optional versionNumber As Str
    entityCode = appServices.getNextEntityCode(entityType)
 
 '  Create and save a new entity + version
-   Set newEntity = new_Entity(entityCode, entityType, versionNumber)
+   Set newEntity = new_Entity(entityCode, entityType, VersionNumber)
    newEntity.isNew = True
    Call Me.saveEntity(newEntity)
-   Call Me.createVersion(entityCode, versionNumber)
+   Call Me.createVersion(entityCode, VersionNumber)
       
    Set createEntity = newEntity
    
@@ -60,7 +60,7 @@ Public Sub createVersion(entityCode As String, versionNro As String)
    
    With rst
       .AddNew
-      !versionNumber = versionNro
+      !VersionNumber = versionNro
       !Item_Code = entityCode
       .Update
       .Close

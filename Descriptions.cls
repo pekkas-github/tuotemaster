@@ -26,7 +26,7 @@ Public Function getDescription(entityCode As String, versionNro As String, langu
 
    Dim sql  As String
    Dim rst  As New ADODB.Recordset
-   Dim Item As description
+   Dim item As description
    
    sql = "SELECT d.Description " & _
          "FROM " & VERSION_DESCRIPTION & " AS d INNER JOIN " & ITEM_VERSION & " AS v ON v.Id = d.ItemVersion_Id " & _
@@ -37,9 +37,9 @@ Public Function getDescription(entityCode As String, versionNro As String, langu
    If rst.EOF Then
       Set getDescription = Nothing
    Else
-      Set Item = new_Description(entityCode, versionNro, language)
-      Item.setText (Nz(rst!description))
-      Set getDescription = Item
+      Set item = new_Description(entityCode, versionNro, language)
+      item.setText (Nz(rst!description))
+      Set getDescription = item
    End If
    
    Set rst = Nothing
