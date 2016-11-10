@@ -9,89 +9,124 @@ Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
 Option Compare Database
 Option Explicit
-'MODIFIED 29.6.2015 in ver 6.1.0 (Data-object removed)
-' GroupMapperilla hallitaan ryhmittelyhierarkioita.
-' Rakenne on ROOT > Category > Group(s) > Item
-' Kaikki hierarkian jäsenet ovat Entiteettejä.
-' Kokonaisia alihierarkioita voi leikata ja siirtää paikasta toiseen.
-' Orvoiksi jääneet alihierarkiat siivotaan
-' Orvoiksi jääneet entiteetit siivotaan TOOLS-työkalulla.
-'**
 
-Private Data                As GroupMapper_Db
-Private thisClipBoard       As Collection     ' Leikepöytä kopioitujen/leikattujen ryhmähierarkioiden tilapäiseen tallettamiseeen
-Private thisCutPending      As Boolean        ' Työpöydällä on kopioituja/leikattuja ryhmähierarkioita
+' GroupMapper handles cutting and pasting categories and subgroups.
+' You can cut and paste several subgroups (with their sub hierarchies.)
+' Orphan subgroups will be cleaned by garbage collection.
 
-Public Sub Copy(ChildEntities As Collection)
-'   Tallettaa "leikepöydälle" ryhmähierarkioiden juurientiteetit myöhempää liittämistä varten.
-'   Aikaisempi kopioitu tai leikattu joukko häviää "leikepöydältä"
+'---- ATTRIBUTES ------------------------------
+Private db                	As GroupMapper_Db
+Private clipBoard       	As Collection     
+Private cutPending      	As Boolean      
 
-    Set thisClipBoard = ChildEntities
-    thisCutPending = False
+
+'---- INIT AND TERMINATE --------------------
+Private Sub Class_Initialize()
+    
+    Set db = New GroupMapper_Db
+
+    cutPending = False
     
 End Sub
 
-Public Sub Cut(ParentEntity As entity, ChildEntities As Collection)
-'   Irrotetaan isäntäryhmästä kaikki kokoelmassa olevat lapset. Isäntä voi olla ROOT, CAT tai GRP.
-'   Lapset voivat olla mitä tahansa tyyppiä. Onnistuneesti irrotetut lapset jäävät muistiin, kunnes
-'       a) tehdään uusi leikkaus/kopiointi (joukko jää orvoksi -> garbage collection)
-'       b) GroupMapper terminoituu (joukko jää orvoksi -> garbage collection)
+Private Sub Class_Terminate()
 
-    Dim ChildEntity As entity
+   Set db = Nothing
+   
+End Sub
+
+'---- METHODS -------------------------------
+
+
+Public Sub cut(parentEntity As entity, childEntities As Collection)
+' Cut all child groups selected in the collection from their parent.
+' Parent may be ROOT, CAT or GRP.
+' Collection remains on clipboard until next cut, copy or garbage collection takes place.
+
+    Dim childEntity As entity
     
-    thisCutPending = True
-    Set thisClipBoard = New Collection
+    cutPending = True
+    Set clipBoard = New Collection
     
-    For Each ChildEntity In ChildEntities
-        Call UnMap(ChildEntity, ParentEntity)
-        thisClipBoard.Add ChildEntity
+    For Each childEntity In childEntities
+        Call UnMap(childEntity, parentEntity)
+        clipBoard.Add childEntity
     Next
             
 End Sub
 
-Public Sub UnMap(ChildEntity As entity, ParentEntity As entity)
-'   Disconnect this child entity from its parent entity
 
-    Call Data.DeleteFromGroupHierarchy(ChildEntity, ParentEntity)
-    
-End Sub
+Public Sub paste(parentEntity As entity)
+' Paste the previously cut child collection to this parent
+' Cut (or copied) collection remains on clipboard.
 
-Public Sub Paste(ParentEntity As entity)
-'   Liitetään aikaisemmin kopioitu/leikattu lapsijoukko valittuun isäntään.
-'   Liittämisen jälkeen lapsikokoelmaa ei tyhjennetä, jotta se voidaan liittää
-'   useampaan isäntään.
-
-    Dim ChildEntity As entity
-    Dim ParentType  As String
-    Dim ChildType   As String
+    Dim childEntity As entity
+    Dim parentType  As String
+    Dim childType   As String
     
-    ParentType = ParentEntity.getType
+    parentType = parentEntity.getType
     
-    For Each ChildEntity In thisClipBoard
-        ChildType = ChildEntity.getType
-        If isMappingOk(ParentType, ChildType) Then
-            Call Map(ChildEntity, ParentEntity)
+    For Each childEntity In clipBoard
+        childType = childEntity.getType
+        If isMappingOk(parentType, childType) Then
+            Call Map(childEntity, parentEntity)
         Else
-            Err.Raise vbObjectError + 513
+            Err.Raise vbObjectError + 513	' parent and child types are incompatible
         End If
     Next
         
-    thisCutPending = False
+    cutPending = False
     
 End Sub
-Private Function isMappingOk(ParentType As String, ChildType As String) As Boolean
-' MODIFIED in ver 6.2.1 (CAT -> MR and MR -> MN added)
-'   Lapsett voivat olla tyypiltään mitä tahansa. Liittämisessä on huolehdittava, että
+
+
+Public Sub copy(childEntities As Collection)
+' Copy all child groups selected in the collection.
+' Collection remains on clipboard until next cut, copy or garbage collection takes place.
+
+    Dim childEntity As entity
+    
+    Set clipBoard = New Collection
+    
+    For Each childEntity In childEntities
+        clipBoard.Add childEntity
+    Next
+
+	cutPending = false
+	    
+End Sub
+
+
+Public Sub unMap(childEntity As entity, parentEntity As entity)
+'   Disconnect this child entity from its parent entity
+
+    Call db.deleteFromGroupHierarchy(childEntity, parentEntity)
+    
+End Sub
+
+
+Public Sub map(childEntity As entity, parentEntity As entity)
+'   Connect the child entity under the selected entity
+    
+    'If item is already mapped then skip
+    If db.IsMappedToParent(childEntity, parentEntity) Then Exit Sub
+    
+    'Otherwise connect item to the parent
+    Call db.InsertInGroupHierarchy(childEntity, parentEntity)
+        
+End Sub
+
+
+Private Function isMappingOk(parentType As String, childType As String) As Boolean
+' Check if mapping is allowed between parent and children
 '       a) ROOT -> CAT
 '       b) CAT -> GRP tai MR
-'       c) GRP -> GRP, MR, MN, CF
-'       d) MR -> MN
+'       c) GRP -> GRP, MR
 
     If _
-    (ParentType = "ROOT" And ChildType = "CAT") Or _
-    (ParentType = "CAT" And (ChildType = "GRP" Or ChildType = "MR")) Or _
-    (ParentType = "MR" And ChildType = "MN") Or _
-    (ParentType = "GRP" And ChildType <> "CAT") _
+	    (parentType = "ROOT" And childType = "CAT") Or _
+	    (parentType = "CAT" And (childType = "GRP" Or childType = "MR")) Or _
+	    (parentType = "GRP" And childType <> "CAT") _
     Then
         isMappingOk = True
     Else
@@ -100,30 +135,9 @@ Private Function isMappingOk(ParentType As String, ChildType As String) As Boole
     
 End Function
 
-Public Sub Map(ChildEntity As entity, ParentEntity As entity)
-'   Connect the child entity under the selected entity
-    
-    'If item is already mapped then skip
-    If Data.IsMappedToParent(ChildEntity, ParentEntity) Then Exit Sub
-    
-    'Otherwise connect item to the parent
-    Call Data.InsertInGroupHierarchy(ChildEntity, ParentEntity)
-        
-End Sub
 
 Public Function isCutPending() As Boolean
-    isCutPending = thisCutPending
+
+    isCutPending = cutPending
+
 End Function
-
-Private Sub Class_Initialize()
-    
-    Set Data = New GroupMapper_Db
-    thisCutPending = False
-    
-End Sub
-
-Private Sub Class_Terminate()
-
-   Set Data = Nothing
-   
-End Sub

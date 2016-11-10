@@ -12,26 +12,29 @@ Option Explicit
 
 Private dbconn As ADODB.Connection
 
+
 Private Sub Class_Initialize()
 
    Set dbconn = CurrentProject.Connection
    
 End Sub
-Public Function IsMappedToParent(ChildEntity As Object, ParentEntity As Object) As Boolean
-' Tarkistaa, onko child-entity jo liitetty parent-ryhm‰‰n.
-'**
+
+
+Public Function isMappedToParent(childEntity As Object, parentEntity As Object) As Boolean
+' Chack if the child is already mapped to the parent
+
     Dim rst As New ADODB.Recordset
     Dim sql As String
     
     sql = "SELECT * FROM " & GROUP_HIERARCHY & _
-          " WHERE Child_Code = '" & ChildEntity.getCode & "' AND Parent_Code = '" & ParentEntity.getCode & "'"
+          " WHERE Child_Code = '" & childEntity.getCode & "' AND Parent_Code = '" & parentEntity.getCode & "'"
           
     rst.Open sql, dbconn, adOpenKeyset
     
     If rst.EOF Then
-        IsMappedToParent = False
+        isMappedToParent = False
     Else
-        IsMappedToParent = True
+        isMappedToParent = True
     End If
     
     Set rst = Nothing
@@ -39,19 +42,18 @@ Public Function IsMappedToParent(ChildEntity As Object, ParentEntity As Object) 
 End Function
 
 
-Public Sub InsertInGroupHierarchy(ChildEntity As Object, ParentEntity As Object)
+Public Sub insertInGroupHierarchy(childEntity As Object, parentEntity As Object)
 ' Maps the child group or item reference to the parent entity
 
     Dim rst As New ADODB.Recordset
     
-    rst.ActiveConnection = CurrentProject.Connection
     rst.Open GROUP_HIERARCHY, dbconn, adOpenDynamic, adLockPessimistic
     
     rst.AddNew
-    rst!Child_Code = ChildEntity.getCode
-    rst!Child_Type = ChildEntity.getType
-    rst!Parent_Code = ParentEntity.getCode
-    rst!Parent_Type = ParentEntity.getType
+    rst!Child_Code = childEntity.getCode
+    rst!Child_Type = childEntity.getType
+    rst!Parent_Code = parentEntity.getCode
+    rst!Parent_Type = parentEntity.getType
     
     rst.Update
     rst.Close
@@ -60,7 +62,7 @@ Public Sub InsertInGroupHierarchy(ChildEntity As Object, ParentEntity As Object)
 End Sub
 
 
-Public Sub DeleteFromGroupHierarchy(ChildEntity As Object, ParentEntity As Object)
+Public Sub deleteFromGroupHierarchy(childEntity As Object, parentEntity As Object)
 '   Cut the parent-child connection. Child branch stays orphan unless it is later
 '   connected to another parent group. Orphan groups are cleaned by garbage collection
 '   in "DeleteOrphanGroupings"
@@ -68,8 +70,8 @@ Public Sub DeleteFromGroupHierarchy(ChildEntity As Object, ParentEntity As Objec
     Dim rst As New ADODB.Recordset
     Dim sql As String
     
-    sql = "SELECT * FROM GroupHierarchy " & _
-          "WHERE Child_Code = '" & ChildEntity.code & "' AND Parent_Code = '" & ParentEntity.code & "'"
+    sql = "SELECT * FROM " & Group_Hierarchy & _
+          " WHERE Child_Code = '" & childEntity.code & "' AND Parent_Code = '" & parentEntity.code & "'"
           
     rst.Open sql, dbconn, , adLockPessimistic
     rst.Delete
@@ -78,6 +80,7 @@ Public Sub DeleteFromGroupHierarchy(ChildEntity As Object, ParentEntity As Objec
     Set rst = Nothing
 
 End Sub
+
 
 Private Sub Class_Terminate()
 
