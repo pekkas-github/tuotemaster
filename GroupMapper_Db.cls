@@ -65,13 +65,13 @@ End Sub
 Public Sub deleteFromGroupHierarchy(childEntity As Object, parentEntity As Object)
 '   Cut the parent-child connection. Child branch stays orphan unless it is later
 '   connected to another parent group. Orphan groups are cleaned by garbage collection
-'   in "DeleteOrphanGroupings"
+'   in "deleteOrphanGroupings" while closing the group mapper.
 
     Dim rst As New ADODB.Recordset
     Dim sql As String
     
-    sql = "SELECT * FROM " & Group_Hierarchy & _
-          " WHERE Child_Code = '" & childEntity.code & "' AND Parent_Code = '" & parentEntity.code & "'"
+    sql = "SELECT * FROM " & GROUP_HIERARCHY & _
+          " WHERE Child_Code = '" & childEntity.getCode & "' AND Parent_Code = '" & parentEntity.getCode & "'"
           
     rst.Open sql, dbconn, , adLockPessimistic
     rst.Delete
@@ -82,6 +82,30 @@ Public Sub deleteFromGroupHierarchy(childEntity As Object, parentEntity As Objec
 End Sub
 
 
+Public Sub deleteOrphanGroups()
+' Loop iterativly through group hierarchies and delete all orphan elements.
+
+   Dim sql  As String
+   Dim rst  As ADODB.Recordset
+   
+   sql = "SELECT g1.Id " & _
+         "FROM " & GROUP_HIERARCHY & " AS g1 " & _
+         "LEFT JOIN " & GROUP_HIERARCHY & " AS g2 ON g1.Parent_Code = g2.Child_Code " & _
+         "WHERE g2.Child_Code Is Null AND g1.Parent_Code <> 'ROOT'"
+   
+   Do
+      Set rst = New ADODB.Recordset
+      rst.Open sql, dbconn, adOpenDynamic, adLockPessimistic
+      While Not rst.EOF
+         rst.Delete
+         rst.Update
+         rst.MoveNext
+      Wend
+   Loop Until rst.BOF
+      
+   Set rst = Nothing
+   
+End Sub
 Private Sub Class_Terminate()
 
    Set dbconn = Nothing

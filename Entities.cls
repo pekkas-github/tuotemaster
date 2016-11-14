@@ -24,11 +24,11 @@ Public Sub init()
 End Sub
 
 
-Public Function createEntity(entityType As String, Optional VersionNumber As String = "1.0") As entity
+Public Function createEntity(entityType As String, Optional VersionNumber As String = "1.0") As Entity
 ' Create and save a new entity and a version associated with it. Default version number is 1.0.
 ' Saving creates the code for the entity and its repositories can be created
 
-   Dim newEntity        As entity
+   Dim newEntity        As Entity
    Dim entityCode       As String
    Dim appServices      As Services
    
@@ -67,12 +67,12 @@ Public Sub createVersion(entityCode As String, versionNro As String)
    End With
 
 End Sub
-Public Function getEntity(entityCode As String, Optional versionNro As String = "last") As entity
+Public Function getEntity(entityCode As String, Optional versionNro As String = "last") As Entity
 ' Return a specific entity. If the version number is not specified, return the last version.
 
    Dim sql              As String
    Dim rst              As New ADODB.Recordset
-   Dim newEntity        As entity
+   Dim newEntity        As Entity
    
 '  Define the version number and get version object
    If versionNro = "last" Then
@@ -95,7 +95,7 @@ Public Function getEntity(entityCode As String, Optional versionNro As String = 
 End Function
 
 
-Public Sub saveEntity(newEntity As entity)
+Public Sub saveEntity(newEntity As Entity)
 ' Save entity and version in database.
 ' Basically saving takes place only when a new entity is created. There might be
 ' need for updating (type property). However type property will propably be moved

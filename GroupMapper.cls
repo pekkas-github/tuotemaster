@@ -15,9 +15,9 @@ Option Explicit
 ' Orphan subgroups will be cleaned by garbage collection.
 
 '---- ATTRIBUTES ------------------------------
-Private db                	As GroupMapper_Db
-Private clipBoard       	As Collection     
-Private cutPending      	As Boolean      
+Private db                      As GroupMapper_Db
+Private clipBoard               As Collection
+Private cutPending              As Boolean
 
 
 '---- INIT AND TERMINATE --------------------
@@ -30,7 +30,9 @@ Private Sub Class_Initialize()
 End Sub
 
 Private Sub Class_Terminate()
+' Clean the group hierarchies before closing by deleting all orphan elements.
 
+   db.deleteOrphanGroups
    Set db = Nothing
    
 End Sub
@@ -38,29 +40,30 @@ End Sub
 '---- METHODS -------------------------------
 
 
-Public Sub cut(parentEntity As entity, childEntities As Collection)
+Public Sub cut(parentEntity As Entity, childEntities As Collection)
 ' Cut all child groups selected in the collection from their parent.
 ' Parent may be ROOT, CAT or GRP.
 ' Collection remains on clipboard until next cut, copy or garbage collection takes place.
 
-    Dim childEntity As entity
+    Dim childEntity As Entity
     
     cutPending = True
     Set clipBoard = New Collection
     
     For Each childEntity In childEntities
-        Call UnMap(childEntity, parentEntity)
+        Call unMap(childEntity, parentEntity)
         clipBoard.Add childEntity
     Next
             
 End Sub
 
 
-Public Sub paste(parentEntity As entity)
+Public Sub paste(parentEntity As Entity)
 ' Paste the previously cut child collection to this parent
 ' Cut (or copied) collection remains on clipboard.
+' Before pasting check that it is allowed for parent-child entity types.
 
-    Dim childEntity As entity
+    Dim childEntity As Entity
     Dim parentType  As String
     Dim childType   As String
     
@@ -69,9 +72,9 @@ Public Sub paste(parentEntity As entity)
     For Each childEntity In clipBoard
         childType = childEntity.getType
         If isMappingOk(parentType, childType) Then
-            Call Map(childEntity, parentEntity)
+            Call map(childEntity, parentEntity)
         Else
-            Err.Raise vbObjectError + 513	' parent and child types are incompatible
+            Err.Raise vbObjectError + 513       ' parent and child types are incompatible
         End If
     Next
         
@@ -84,7 +87,7 @@ Public Sub copy(childEntities As Collection)
 ' Copy all child groups selected in the collection.
 ' Collection remains on clipboard until next cut, copy or garbage collection takes place.
 
-    Dim childEntity As entity
+    Dim childEntity As Entity
     
     Set clipBoard = New Collection
     
@@ -92,12 +95,12 @@ Public Sub copy(childEntities As Collection)
         clipBoard.Add childEntity
     Next
 
-	cutPending = false
-	    
+        cutPending = False
+            
 End Sub
 
 
-Public Sub unMap(childEntity As entity, parentEntity As entity)
+Public Sub unMap(childEntity As Entity, parentEntity As Entity)
 '   Disconnect this child entity from its parent entity
 
     Call db.deleteFromGroupHierarchy(childEntity, parentEntity)
@@ -105,28 +108,29 @@ Public Sub unMap(childEntity As entity, parentEntity As entity)
 End Sub
 
 
-Public Sub map(childEntity As entity, parentEntity As entity)
+Public Sub map(childEntity As Entity, parentEntity As Entity)
 '   Connect the child entity under the selected entity
     
     'If item is already mapped then skip
-    If db.IsMappedToParent(childEntity, parentEntity) Then Exit Sub
+    If db.isMappedToParent(childEntity, parentEntity) Then Exit Sub
     
     'Otherwise connect item to the parent
-    Call db.InsertInGroupHierarchy(childEntity, parentEntity)
+    Call db.insertInGroupHierarchy(childEntity, parentEntity)
         
 End Sub
+
 
 
 Private Function isMappingOk(parentType As String, childType As String) As Boolean
 ' Check if mapping is allowed between parent and children
 '       a) ROOT -> CAT
-'       b) CAT -> GRP tai MR
-'       c) GRP -> GRP, MR
+'       b) CAT -> GRP
+'       c) GRP -> GRP, MR (i.e. <> CAT)
 
     If _
-	    (parentType = "ROOT" And childType = "CAT") Or _
-	    (parentType = "CAT" And (childType = "GRP" Or childType = "MR")) Or _
-	    (parentType = "GRP" And childType <> "CAT") _
+            (parentType = "ROOT" And childType = "CAT") Or _
+            (parentType = "CAT" And childType = "GRP") Or _
+            (parentType = "GRP" And childType <> "CAT") _
     Then
         isMappingOk = True
     Else

@@ -57,10 +57,10 @@ Public Function new_Descriptions() As Descriptions
 End Function
 
 
-Public Function new_Entity(entityCode As String, entityType As String, versionNro As String) As entity
+Public Function new_Entity(entityCode As String, entityType As String, versionNro As String) As Entity
 ' Construct a new entity with proper behaviors
 
-   Dim newEntity     As New entity
+   Dim newEntity     As New Entity
    Dim nameBehavior  As Object
    Dim ownerBehavior As Object
    
