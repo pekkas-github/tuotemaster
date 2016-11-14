@@ -120,9 +120,18 @@ Public Function getLastDecision() As Decision
 End Function
 
 
-Public Sub setDecision(objDecision As Decision)
+Public Function getNewDecision() as Decision
+' Return a new decision object with default values
 
-   Call app.Decisions.saveDecision(oCode, oVersionNro, objDecision)
+	Set getNewDecision = app.Decisions.createDecision
+	
+End Function
+
+
+Public Sub setDecision(newDecision as Decision)
+' Save a new decision for this entity version
+	
+   Call app.Decisions.saveDecision(oCode, oVersionNro, newDecision)
    
 End Sub
 
