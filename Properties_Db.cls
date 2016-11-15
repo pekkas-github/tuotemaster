@@ -40,7 +40,7 @@ Public Sub insertProperty(entityCode As String, propertyType As String, property
 
    Dim rst  As New ADODB.Recordset
    
-   rst.Open PROPERTY_VALUE, dbconn, adOpenDynamic, adLockPessimistic
+   rst.Open ITEM_PROPERTY_VALUE, dbconn, adOpenDynamic, adLockPessimistic
    
    With rst
       .AddNew

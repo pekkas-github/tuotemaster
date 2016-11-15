@@ -382,7 +382,7 @@ Public Function rsProperties(entityType As String, entityCode As String) As Stri
                    "WHERE Item_Code = '" & entityCode & "' AND b.Language = '" & lang & "'"
    
    '
-   sqlRowsource = "SELECT dp.Property_Id, dp.Property, val.Value " & _
+   sqlRowsource = "SELECT dp.Property_Id, dp.Property, val.[Value] " & _
                   "FROM (" & sqlDefaultProperties & ") AS dp " & _
                   "LEFT JOIN (" & sqlItemValues & ") AS val ON dp.Property_Id = val.Property_Id"
 
