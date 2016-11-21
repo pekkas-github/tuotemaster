@@ -69,6 +69,13 @@ Public Function getValue() As String
 
 End Function
 
+
+Public Function getValueName(language As String) As String
+
+   getValueName = db.getPropertyValueName(oValue, language)
+   
+End Function
+
 Public Property Get isNew() As Boolean
    
    isNew = oNew

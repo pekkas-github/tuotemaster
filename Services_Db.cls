@@ -42,6 +42,7 @@ End Function
 
 
 Public Function GetVersionNumbers(entityCode As String) As Collection
+' Return all version numbers of the entity in a collection
 
     Dim rst                 As New ADODB.Recordset
     Dim sql                 As String
@@ -68,6 +69,185 @@ Public Function GetVersionNumbers(entityCode As String) As Collection
     
 End Function
 
+Public Function getVersionIds(entityCode As String) As Collection
+' Return all version ids of the entity in a collection
+
+   Dim rst        As New ADODB.Recordset
+   Dim sql        As String
+   Dim verId      As Long
+   Dim col        As Collection
+   
+   sql = "SELECT v.Id " & _
+         "FROM " & CORE_ITEM & " AS i " & _
+         "INNER JOIN " & ITEM_VERSION & " AS v ON v.Item_Code = i.Code " & _
+         "WHERE i.Code = '" & entityCode & "'"
+          
+   rst.Open sql, dbconn, adOpenDynamic, adLockPessimistic
+   Set col = New Collection
+   
+   While Not rst.EOF
+       verId = rst(0)
+       col.Add verId
+       rst.MoveNext
+   Wend
+   
+   Set getVersionIds = col
+   Set rst = Nothing
+   Set col = Nothing
+   
+End Function
+
+
+Public Sub deleteNames(entityCode As String)
+   Dim rst  As New ADODB.Recordset
+   Dim sql  As String
+   
+   sql = "SELECT * FROM " & ITEM_NAME & " WHERE Item_Code = '" & entityCode & "'"
+   
+   rst.Open sql, dbconn, adOpenDynamic, adLockPessimistic
+   
+   While Not rst.EOF
+      rst.Delete
+      rst.Update
+      rst.MoveNext
+   Wend
+   
+   Set rst = Nothing
+   
+End Sub
+
+
+Public Sub deleteOwners(entityCode As String)
+   Dim rst  As New ADODB.Recordset
+   Dim sql  As String
+   
+   sql = "SELECT * FROM " & ITEM_OWNER & " WHERE Item_Code = '" & entityCode & "'"
+   
+   rst.Open sql, dbconn, adOpenDynamic, adLockPessimistic
+   
+   While Not rst.EOF
+      rst.Delete
+      rst.Update
+      rst.MoveNext
+   Wend
+   
+   Set rst = Nothing
+   
+End Sub
+
+
+Public Sub deleteDescriptions(verId As Long)
+   Dim rst  As New ADODB.Recordset
+   Dim sql  As String
+   
+   sql = "SELECT * FROM " & VERSION_DESCRIPTION & " WHERE ItemVersion_Id = " & verId
+   
+   rst.Open sql, dbconn, adOpenDynamic, adLockPessimistic
+   
+   While Not rst.EOF
+      rst.Delete
+      rst.Update
+      rst.MoveNext
+   Wend
+   
+   Set rst = Nothing
+
+End Sub
+
+
+Public Sub deleteStatuses(verId As Long)
+   Dim rst  As New ADODB.Recordset
+   Dim sql  As String
+   
+   sql = "SELECT * FROM " & VERSION_STATUS & " WHERE ItemVersion_Id = " & verId
+   
+   rst.Open sql, dbconn, adOpenDynamic, adLockPessimistic
+   
+   While Not rst.EOF
+      rst.Delete
+      rst.Update
+      rst.MoveNext
+   Wend
+   
+   Set rst = Nothing
+
+End Sub
+
+
+Public Sub deleteDecisions(verId As Long)
+   Dim rst  As New ADODB.Recordset
+   Dim sql  As String
+   
+   sql = "SELECT * FROM " & VERSION_DECISION & " WHERE ItemVersion_Id = " & verId
+   
+   rst.Open sql, dbconn, adOpenDynamic, adLockPessimistic
+   
+   While Not rst.EOF
+      rst.Delete
+      rst.Update
+      rst.MoveNext
+   Wend
+   
+   Set rst = Nothing
+
+End Sub
+
+
+Public Sub deleteVersion(verId As Long)
+   Dim rst  As New ADODB.Recordset
+   Dim sql  As String
+   
+   sql = "SELECT * FROM " & ITEM_VERSION & " WHERE Id = " & verId
+   
+   rst.Open sql, dbconn, adOpenDynamic, adLockPessimistic
+   
+   While Not rst.EOF
+      rst.Delete
+      rst.Update
+      rst.MoveNext
+   Wend
+   
+   Set rst = Nothing
+
+End Sub
+
+
+Public Sub deleteProperties(entityCode As String)
+   Dim rst  As New ADODB.Recordset
+   Dim sql  As String
+   
+   sql = "SELECT * FROM " & ITEM_PROPERTY_VALUE & " WHERE Item_Code = '" & entityCode & "'"
+   
+   rst.Open sql, dbconn, adOpenDynamic, adLockPessimistic
+   
+   While Not rst.EOF
+      rst.Delete
+      rst.Update
+      rst.MoveNext
+   Wend
+   
+   Set rst = Nothing
+
+End Sub
+
+
+Public Sub deleteEntity(entityCode As String)
+   Dim rst  As New ADODB.Recordset
+   Dim sql  As String
+   
+   sql = "SELECT * FROM " & CORE_ITEM & " WHERE Code = '" & entityCode & "'"
+   
+   rst.Open sql, dbconn, adOpenDynamic, adLockPessimistic
+   
+   While Not rst.EOF
+      rst.Delete
+      rst.Update
+      rst.MoveNext
+   Wend
+   
+   Set rst = Nothing
+
+End Sub
 Private Sub Class_Terminate()
 
    Set dbconn = Nothing

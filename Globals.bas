@@ -3,7 +3,8 @@ Option Compare Database
 Option Explicit
 '
 Public Args             As Collection   ' Collection is used to pass data between forms
-Public lang             As String       ' Selected translation of product data (UI labels are always in English
+Public lang             As String       ' UI language for product data in UI (UI labels are always in English)
+Public clipBoard        As Collection   ' temporary storage for copy and paste
 
 '  Usergroups
    Public Const ADMIN      As Integer = 1
@@ -34,6 +35,7 @@ Public lang             As String       ' Selected translation of product data (
    Public Const PARTY                 As String = "dbo_ltbPerson"
    Public Const ITEM_STATUS           As String = "dbo_Statuses"
    Public Const BILLING_ITEMS         As String = "dbo_lnk_BSS_tuotekannat"
+   Public Const BILLING_MAPPING       As String = "dbo_LegacyMapping"
    Public Const BILLING_STATUS        As String = "dbo_LegacyStatusMapping"
    Public Const BILLING_STATUS_NAME   As String = "dbo_LegacyStatusName"
    Public Const PRICE_LINE            As String = "dbo_PriceLine"

@@ -58,7 +58,7 @@ Public Sub updateProperty(entityCode As String, propertyType As String, property
    Dim sql  As String
    Dim rst  As New ADODB.Recordset
    
-   sql = "SELECT * FROM " & PROPERTY_VALUE & " WHERE Item_Code = '" & entityCode & "' AND Property_Id = '" & propertyType & "'"
+   sql = "SELECT * FROM " & ITEM_PROPERTY_VALUE & " WHERE Item_Code = '" & entityCode & "' AND Property_Id = '" & propertyType & "'"
    
    rst.Open sql, dbconn, adOpenDynamic, adLockPessimistic
    
@@ -81,6 +81,23 @@ Public Function getPropertyTypeName(propertyType As String, language As String) 
    rst.Open sql, dbconn, adOpenForwardOnly, adLockPessimistic
    
    getPropertyTypeName = rst!LookupText
+   
+   Set rst = Nothing
+   
+End Function
+
+
+Public Function getPropertyValueName(propertyValue As String, language As String) As String
+
+   Dim sql  As String
+   Dim rst  As New ADODB.Recordset
+   
+   sql = "SELECT LookupText FROM " & PROPERTY_VALUE & _
+         " WHERE Value_Id = '" & propertyValue & "' AND [Language] = '" & language & "'"
+         
+   rst.Open sql, dbconn, adOpenDynamic, adLockPessimistic
+   
+   getPropertyValueName = rst!LookupText
    
    Set rst = Nothing
    

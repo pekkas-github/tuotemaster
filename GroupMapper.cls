@@ -16,7 +16,6 @@ Option Explicit
 
 '---- ATTRIBUTES ------------------------------
 Private db                      As GroupMapper_Db
-Private clipBoard               As Collection
 Private cutPending              As Boolean
 
 
@@ -48,11 +47,11 @@ Public Sub cut(parentEntity As Entity, childEntities As Collection)
     Dim childEntity As Entity
     
     cutPending = True
-    Set clipBoard = New Collection
+    Set Globals.clipBoard = New Collection
     
     For Each childEntity In childEntities
         Call unMap(childEntity, parentEntity)
-        clipBoard.Add childEntity
+        Globals.clipBoard.Add childEntity
     Next
             
 End Sub
@@ -69,7 +68,7 @@ Public Sub paste(parentEntity As Entity)
     
     parentType = parentEntity.getType
     
-    For Each childEntity In clipBoard
+    For Each childEntity In Globals.clipBoard
         childType = childEntity.getType
         If isMappingOk(parentType, childType) Then
             Call map(childEntity, parentEntity)
@@ -89,10 +88,10 @@ Public Sub copy(childEntities As Collection)
 
     Dim childEntity As Entity
     
-    Set clipBoard = New Collection
+    Set Globals.clipBoard = New Collection
     
     For Each childEntity In childEntities
-        clipBoard.Add childEntity
+        Globals.clipBoard.Add childEntity
     Next
 
         cutPending = False

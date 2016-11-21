@@ -128,11 +128,33 @@ End Function
 
 Public Function ParseVersionMinorPart(VersionNumber As String) As Integer
 ' Palauttaa version "m.n" minor osan lukuna n.
-    
+
     ParseVersionMinorPart = CInt(Right(VersionNumber, (Len(VersionNumber) - InStr(1, VersionNumber, ".", 1))))
     
 End Function
 
+
+Public Sub deleteEntityPermanently(entityCode As String)
+' Delete the entity and all of its attributes and relations permanently from database
+' Basically the only entities that are deleted are categories and subgroups
+   Dim versionIdCol  As Collection
+   Dim verId         As Variant
+   
+   Set versionIdCol = db.getVersionIds(entityCode)
+   
+   For Each verId In versionIdCol
+      db.deleteDescriptions (verId)
+      db.deleteStatuses (verId)
+      db.deleteDecisions (verId)
+      db.deleteVersion (verId)
+   Next
+   
+   db.deleteNames (entityCode)
+   db.deleteOwners (entityCode)
+   db.deleteProperties (entityCode)
+   db.deleteEntity (entityCode)
+   
+End Sub
 Private Sub Class_Terminate()
    
    Set db = Nothing
