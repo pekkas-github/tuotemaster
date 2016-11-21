@@ -48,6 +48,19 @@ Public Function getProperty(propertyType As String) As Property
    
 End Function
 
+
+Public Sub saveProperty(prop As Property)
+'  Insert or update the property (value) into database.
+
+   If prop.isNew Then
+      Call db.insertProperty(oEntityCode, prop.getType, prop.getValue)
+   ElseIf prop.isModified Then
+      Call db.updateProperty(oEntityCode, prop.getType, prop.getValue)
+   End If
+   
+End Sub
+
+
 Public Function rsString(language As String) As String
 '  Return rowsource with valid properties and their current values
 
@@ -96,18 +109,6 @@ Public Function rsStringValues(propertyType As String, language As String) As St
    rsStringValues = sql
    
 End Function
-
-
-Public Sub saveProperty(prop As Property)
-'  Insert or update the property (value) into database.
-
-   If prop.isNew Then
-      Call db.insertProperty(oEntityCode, prop.getType, prop.getValue)
-   ElseIf prop.isModified Then
-      Call db.updateProperty(oEntityCode, prop.getType, prop.getValue)
-   End If
-   
-End Sub
 
 
 Private Sub Class_Terminate()

@@ -146,6 +146,8 @@ Public Sub setDescription(newText As String, language As String)
    Call app.Descriptions.saveDescription(newDescription)
    
 End Sub
+
+
 Public Sub setName(newNameText As String, language As String)
 
    Call oNames.saveName(oCode, new_Name(newNameText, language))
@@ -165,11 +167,28 @@ Public Sub setStatus(statusId As Integer, startDate As Date)
    Call app.Statuses.saveStatus(oCode, oVersionNro, new_Status(statusId, startDate))
    
 End Sub
+
+
 Public Function Properties() As Properties
+' This is the old version - replaced by getProperty and setProperty methods.
 
    Set Properties = oProperties
    
 End Function
+
+
+Public Function getProperty(propertyType as String) as Property
+
+	set getProperty = oProperties.getProperty(propertyType)
+
+End Function
+
+
+public sub	setProperty(value as property)
+
+	call oproperties.saveProperty(value)
+	
+end sub
 
 
 Public Property Get isNew() As Boolean

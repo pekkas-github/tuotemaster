@@ -9,11 +9,11 @@ Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
 Option Compare Database
 Option Explicit
-'CREATED in ftr#003
+' This class represents a single property value.
 
 Private app             As Application_API
 Private db              As Properties_Db
-Private oEntityType     As String   ' needed for getting valid value list
+Private oEntityType     As String   ' needed for getting valid value list?
 Private oPropertyType   As String   ' needed for getting valid value list and property name
 Private oValue          As String   ' stores the selected value
 Private oNew            As Boolean
