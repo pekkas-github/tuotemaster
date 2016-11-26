@@ -389,3 +389,10 @@ Public Function rsProperties(entityType As String, entityCode As String) As Stri
    rsProperties = sqlRowsource
    
 End Function
+
+
+Public Function rsLanguages() As String
+   
+   rsLanguages = "fin;suomi;eng;englanti;swe;ruotsi"
+   
+End Function

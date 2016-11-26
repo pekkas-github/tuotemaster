@@ -11,24 +11,24 @@ Option Compare Database
 Option Explicit
 ' This class represents a single property value.
 
-Private app             As Application_API
-Private db              As Properties_Db
-Private oEntityType     As String   ' needed for getting valid value list?
-Private oPropertyType   As String   ' needed for getting valid value list and property name
-Private oValue          As String   ' stores the selected value
-Private oNew            As Boolean
-Private oModified       As Boolean
+Private app                   As Application_API
+Private db                    As Dba_Properties
+Private oEntityType        As String   ' needed for getting valid value list?
+Private oPropertyType      As String   ' needed for getting valid value list and property name
+Private oPropertyValue     As String   ' stores the selected value
+Private oNew               As Boolean
+Private oModified          As Boolean
 
 
 'constructor
-Public Sub init(entityType As String, propertyTypeId As String, valueId As String, isNew As Boolean)
+Public Sub init(entityType As String, propertyTypeId As String, propertyValueId As String, isNew As Boolean)
    
    Set app = New Application_API
-   Set db = New Properties_Db
+   Set db = New Dba_Properties
    
    oEntityType = entityType
    oPropertyType = propertyTypeId
-   oValue = valueId
+   oPropertyValue = propertyValueId
    oNew = isNew
    oModified = False
    
@@ -57,7 +57,7 @@ Public Function getEntityType() As String
 End Function
 Public Sub setValue(valueId As String)
    
-   oValue = valueId
+   oPropertyValue = valueId
    oModified = True
 
 End Sub
@@ -65,14 +65,14 @@ End Sub
 
 Public Function getValue() As String
    
-   getValue = oValue
+   getValue = oPropertyValue
 
 End Function
 
 
 Public Function getValueName(language As String) As String
 
-   getValueName = db.getPropertyValueName(oValue, language)
+   getValueName = db.getPropertyValueName(oPropertyValue, language)
    
 End Function
 

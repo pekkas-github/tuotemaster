@@ -13,18 +13,28 @@ Option Explicit
 ' Class Documents; gets document references and associates entities with
 ' documents
 
-Private db     As Documents_Db
+Private db           As Dba_Documents
+Private parentCode   As String
+Private versionNro   As String
 
 
-Public Sub init()
+Public Sub init(pCode As String, pVer As String)
    
-   Set db = New Documents_Db
+   Set db = New Dba_Documents
+   parentCode = pCode
+   versionNro = pVer
    
 End Sub
 
+Private Sub Class_Terminate()
 
+   Set db = Nothing
+   
+End Sub
 
-Public Function getDocument(docId As Long) As Document
+'---- METHODS -------------------------
+
+Public Function getDocReference(docId As Long) As Document
 ' Return a document reference object
 
    Dim docRst     As ADODB.Recordset
@@ -45,7 +55,7 @@ Public Function getDocument(docId As Long) As Document
         docRef.isModified = False
    End With
                         
-   Set getDocument = docRef
+   Set getDocReference = docRef
    
    Set docRst = Nothing
    Set docRef = Nothing
@@ -53,16 +63,16 @@ Public Function getDocument(docId As Long) As Document
 End Function
 
 
-
 Public Function createDocReference() As Document
 
-        Dim docRef      As Document
-        
-        Set docRef = New Document
-        
-        With docRef
-
-        End With
+   Dim docRef      As Document
+   
+   Set docRef = New Document
+   
+   With docRef
+      .setName ("New document reference")
+      .isPersistent = False
+   End With
 
    Set createDocReference = docRef
    Set docRef = Nothing
@@ -70,8 +80,24 @@ Public Function createDocReference() As Document
 End Function
 
 
-Private Sub Class_Terminate()
+Public Sub saveDocReference(docRef As Document)
 
-   Set db = Nothing
+   Dim app        As Application_API
+   Dim versionId  As Long
    
+   Set app = New Application_API
+   
+   versionId = app.Services.getVersionId(parentCode, versionNro)
+   
+   If docRef.isPersistent Then
+      Call db.updateDocReference(docRef)
+   Else
+      docRef.setId (db.insertDocReference(versionId, docRef))
+   End If
+   
+   Set app = Nothing
+   
+
 End Sub
+
+

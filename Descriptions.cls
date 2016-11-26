@@ -11,11 +11,13 @@ Option Compare Database
 Option Explicit
 
 Private app          As Application_API
+Private Services     As Services
 Private dbconn       As ADODB.Connection
 
 Public Sub init()
 
    Set app = New Application_API
+   Set Services = New Services
    Set dbconn = CurrentProject.Connection
    
 End Sub
@@ -55,7 +57,7 @@ Public Sub saveDescription(newDescription As description)
    
    With newDescription
       Set currentDescription = getDescription(.getEntityCode, .getVersionNro, .getLanguage)
-      versionId = DLookup("Id", ITEM_VERSION, "Item_Code = '" & .getEntityCode & "' AND VersionNumber = '" & .getVersionNro & "'")
+      versionId = Services.getVersionId(.getEntityCode, .getVersionNro)
    End With
    
    If currentDescription Is Nothing Then
@@ -123,6 +125,7 @@ End Function
 Public Sub Class_Terminate()
    
    Set app = Nothing
+   Set Services = Nothing
    Set dbconn = Nothing
    
 End Sub

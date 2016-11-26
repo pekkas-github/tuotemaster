@@ -67,19 +67,19 @@ Public Function new_Entity(entityCode As String, entityType As String, versionNr
    Select Case entityType
       Case "MN"
          Set nameBehavior = New Names_Any
-         Call nameBehavior.init
+         Call nameBehavior.init(entityCode, entityType)
          Set ownerBehavior = New Owners_Parent
          Call ownerBehavior.init
       
       Case "GRP"
          Set nameBehavior = New Names_Any
-         Call nameBehavior.init
+         Call nameBehavior.init(entityCode, entityType)
          Set ownerBehavior = New Owners_Self
          Call ownerBehavior.init
       
       Case Else
          Set nameBehavior = New Names_Unique
-         Call nameBehavior.init(entityType)
+         Call nameBehavior.init(entityCode, entityType)
          Set ownerBehavior = New Owners_Self
          Call ownerBehavior.init
    End Select
@@ -128,18 +128,6 @@ Public Function new_Owner(personId As Long, startDate As Date) As Owner
 End Function
 
 
-Public Function new_Owners() As Owners
-
-   Dim newOwners As New Owners
-   
-   Call newOwners.init
-   Set new_Owners = newOwners
-   
-   Set newOwners = Nothing
-   
-End Function
-
-
 Public Function new_Property(entityType As String, propertyType As String, valueId As String, isNew As Boolean) As Property
 
    Dim newProperty   As New Property
@@ -162,6 +150,17 @@ Public Function new_Properties(entityCode As String, entityType As String)
    
 End Function
 
+
+Public Function new_Documents(entityCode As String, versionNro As String) As Documents
+
+   Dim newDocuments  As New Documents
+   
+   Call newDocuments.init(entityCode, versionNro)
+   Set new_Documents = newDocuments
+   
+   Set newDocuments = Nothing
+   
+End Function
 
 Public Function new_Status(statusType As Integer, startDate As Date) As Status
 '

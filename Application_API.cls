@@ -11,12 +11,6 @@ Option Compare Database
 Option Explicit
 
 
-Public Function Documents() As Documents
-   
-   Set Documents = New Documents
-   Call Documents.init
-      
-End Function
 Public Function Entities() As Entities
    
    Set Entities = New Entities
@@ -52,3 +46,4 @@ Public Function Decisions() As Decisions
    Call Decisions.init
    
 End Function
+

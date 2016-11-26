@@ -16,7 +16,8 @@ Option Explicit
 Private oPersonId    As Long
 Private oStartDate   As Date
 Private oEndDate     As Date
-Private dbconn       As ADODB.Connection
+Private db           As Dba_Owners
+'
 
 'constructor
 Public Sub init(personId As Long, startDate As Date)
@@ -24,24 +25,15 @@ Public Sub init(personId As Long, startDate As Date)
    oPersonId = personId
    oStartDate = startDate
    oEndDate = "31.12.2050"
-   Set dbconn = CurrentProject.Connection
+   Set db = New Dba_Owners
    
 End Sub
 
 
 Public Function getName() As String
-' Return the actual name of the owner (lets put sql in a db object)
+' Return the actual name of the owner
 
-   Dim sql  As String
-   Dim rst  As New ADODB.Recordset
-   
-   sql = "SELECT PersonName FROM " & PARTY & " WHERE Id = " & oPersonId
-   
-   rst.Open sql, dbconn, adOpenDynamic, adLockPessimistic
-   
-   getName = rst(0)
-   
-   Set rst = Nothing
+   getName = db.getPersonName(oPersonId)
    
 End Function
 
@@ -80,6 +72,6 @@ End Sub
 
 Private Sub Class_Terminate()
 
-   Set dbconn = Nothing
+   Set db = Nothing
    
 End Sub

@@ -15,7 +15,7 @@ Option Explicit
 ' Allowed values of a property type are specific for each entity type.
 
 Private app          As Application_API
-Private db           As Properties_Db
+Private db           As Dba_Properties
 Private oEntityCode  As String
 Private oEntityType  As String
 
@@ -23,7 +23,7 @@ Private oEntityType  As String
 Public Sub init(entityCode As String, entityType As String)
    
    Set app = New Application_API
-   Set db = New Properties_Db
+   Set db = New Dba_Properties
    oEntityCode = entityCode
    oEntityType = entityType
    

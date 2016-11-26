@@ -15,14 +15,14 @@ Option Explicit
 ' Orphan subgroups will be cleaned by garbage collection.
 
 '---- ATTRIBUTES ------------------------------
-Private db                      As GroupMapper_Db
+Private db                      As Dba_GroupMapper
 Private cutPending              As Boolean
 
 
 '---- INIT AND TERMINATE --------------------
 Private Sub Class_Initialize()
     
-    Set db = New GroupMapper_Db
+    Set db = New Dba_GroupMapper
 
     cutPending = False
     
@@ -38,42 +38,41 @@ End Sub
 
 '---- METHODS -------------------------------
 
-
 Public Sub cut(parentEntity As Entity, childEntities As Collection)
 ' Cut all child groups selected in the collection from their parent.
 ' Parent may be ROOT, CAT or GRP.
 ' Collection remains on clipboard until next cut, copy or garbage collection takes place.
 
-    Dim childEntity As Entity
+    Dim ChildEntity As Entity
     
     cutPending = True
     Set Globals.clipBoard = New Collection
     
-    For Each childEntity In childEntities
-        Call unMap(childEntity, parentEntity)
-        Globals.clipBoard.Add childEntity
+    For Each ChildEntity In childEntities
+        Call unMap(ChildEntity, parentEntity)
+        Globals.clipBoard.Add ChildEntity
     Next
             
 End Sub
 
 
 Public Sub paste(parentEntity As Entity)
-' Paste the previously cut child collection to this parent
+' Paste the previously copied/cut child collection to this parent
+' Before pasting check that it is allowed for child type and parent sub type match.
 ' Cut (or copied) collection remains on clipboard.
-' Before pasting check that it is allowed for parent-child entity types.
 
-    Dim childEntity As Entity
-    Dim parentType  As String
-    Dim childType   As String
+    Dim ChildEntity     As Entity
+    Dim parentSubType   As String
+    Dim childType       As String
     
-    parentType = parentEntity.getType
+    parentSubType = parentEntity.getProperty("SUB_MEM").getValue
     
-    For Each childEntity In Globals.clipBoard
-        childType = childEntity.getType
-        If isMappingOk(parentType, childType) Then
-            Call map(childEntity, parentEntity)
+    For Each ChildEntity In Globals.clipBoard
+        childType = ChildEntity.getType
+        If parentSubType = childType Then
+            Call map(ChildEntity, parentEntity)
         Else
-            Err.Raise vbObjectError + 513       ' parent and child types are incompatible
+            Err.Raise vbObjectError + 513, , "Parent and child items are incompatible."
         End If
     Next
         
@@ -86,12 +85,12 @@ Public Sub copy(childEntities As Collection)
 ' Copy all child groups selected in the collection.
 ' Collection remains on clipboard until next cut, copy or garbage collection takes place.
 
-    Dim childEntity As Entity
+    Dim ChildEntity As Entity
     
     Set Globals.clipBoard = New Collection
     
-    For Each childEntity In childEntities
-        Globals.clipBoard.Add childEntity
+    For Each ChildEntity In childEntities
+        Globals.clipBoard.Add ChildEntity
     Next
 
         cutPending = False
@@ -99,44 +98,24 @@ Public Sub copy(childEntities As Collection)
 End Sub
 
 
-Public Sub unMap(childEntity As Entity, parentEntity As Entity)
+Public Sub unMap(ChildEntity As Entity, parentEntity As Entity)
 '   Disconnect this child entity from its parent entity
 
-    Call db.deleteFromGroupHierarchy(childEntity, parentEntity)
+    Call db.deleteFromGroupHierarchy(ChildEntity, parentEntity)
     
 End Sub
 
 
-Public Sub map(childEntity As Entity, parentEntity As Entity)
+Public Sub map(ChildEntity As Entity, parentEntity As Entity)
 '   Connect the child entity under the selected entity
     
     'If item is already mapped then skip
-    If db.isMappedToParent(childEntity, parentEntity) Then Exit Sub
+    If db.isMappedToParent(ChildEntity, parentEntity) Then Exit Sub
     
     'Otherwise connect item to the parent
-    Call db.insertInGroupHierarchy(childEntity, parentEntity)
+    Call db.InsertInGroupHierarchy(ChildEntity, parentEntity)
         
 End Sub
-
-
-
-Private Function isMappingOk(parentType As String, childType As String) As Boolean
-' Check if mapping is allowed between parent and children
-'       a) ROOT -> CAT
-'       b) CAT -> GRP
-'       c) GRP -> GRP, MR (i.e. <> CAT)
-
-    If _
-            (parentType = "ROOT" And childType = "CAT") Or _
-            (parentType = "CAT" And childType = "GRP") Or _
-            (parentType = "GRP" And childType <> "CAT") _
-    Then
-        isMappingOk = True
-    Else
-        isMappingOk = False
-    End If
-    
-End Function
 
 
 Public Function isCutPending() As Boolean

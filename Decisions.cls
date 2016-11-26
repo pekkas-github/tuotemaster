@@ -18,12 +18,14 @@ Option Explicit
 ' CREATED in HOT#005
 
 Private app                As Application_API
+Private Services           As Services
 Private dbconn             As ADODB.Connection
 
 
 Public Sub init()
 
    Set app = New Application_API
+   Set Services = New Services
    Set dbconn = CurrentProject.Connection
    
 End Sub
@@ -111,7 +113,7 @@ Public Sub saveDecision(entityCode As String, versionNro As String, newDecision 
    Dim lastDecision  As Decision
    Dim versionId     As Long
    
-   versionId = DLookup("Id", ITEM_VERSION, "Item_Code = '" & entityCode & "' AND VersionNumber = '" & versionNro & "'")
+   versionId = Services.getVersionId(entityCode, versionNro)
    
    If Not newDecision.isNew Then
 '     update existing decision
@@ -208,6 +210,7 @@ End Function
 Private Sub Class_Terminate()
 
    Set app = Nothing
+   Set Services = Nothing
    Set dbconn = Nothing
    
 End Sub

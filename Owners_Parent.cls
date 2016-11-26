@@ -10,22 +10,28 @@ Attribute VB_Exposed = True
 Option Compare Database
 Option Explicit
 
-Implements Owners_IF
+Implements If_Owners
 
 ' This class represents the owner behavior for those entities
 ' that are owned by their parents
 
-Private db     As Owners_Db
-
+Private db     As Dba_Owners
+'
 
 Public Sub init()
 
-   Set db = New Owners_Db
+   Set db = New Dba_Owners
    
 End Sub
 
+Private Sub Class_Terminate()
 
-Private Function Owners_IF_getOwner(entityCode As String) As Owner
+   Set db = Nothing
+   
+End Sub
+
+'---- METHODS -----------------
+Private Function getOwner(entityCode As String) As Owner
 ' Return current owner of the parent entity.
 
    Dim rst  As ADODB.Recordset
@@ -33,28 +39,15 @@ Private Function Owners_IF_getOwner(entityCode As String) As Owner
    Set rst = db.getParentEntityOwner(entityCode)
    
    If rst.EOF Then
-      Set Owners_IF_getOwner = Nothing     ' no owners
+      Set getOwner = Nothing     ' no owners
    Else
-      Set Owners_IF_getOwner = new_Owner(rst!Id, rst!startDate)
+      Set getOwner = new_Owner(rst!Id, rst!startDate)
    End If
    
 End Function
 
-Private Function Owners_IF_rsString(entityCode As String) As String
-' Return as a rowsource an owner list of the parent entity of this entity.
 
-   Owners_IF_rsString = db.getRowSourceOfParentEntityOwners(entityCode)
-      
-End Function
-
-Private Function Owners_IF_rsStringAll() As String
-' Rowsource that returns a list of the whole owners register
-
-   Owners_IF_rsStringAll = db.getRowSourceOfAllOwners()
-   
-End Function
-
-Private Sub Owners_IF_saveOwner(entityCode As String, newOwner As Owner)
+Private Sub saveOwner(entityCode As String, newOwner As Owner)
 ' This action is not allowed for entities that don't have owners of theri own
 ' (ownership is on the parent level)
 
@@ -62,8 +55,16 @@ Private Sub Owners_IF_saveOwner(entityCode As String, newOwner As Owner)
    
 End Sub
 
-Private Sub Class_Terminate()
+'---- INTERFACE CALLS ---------------------
 
-   Set db = Nothing
+Private Function If_Owners_getOwner(entityCode As String) As Owner
+
+   Set If_Owners_getOwner = getOwner(entityCode)
+   
+End Function
+
+Private Sub If_Owners_saveOwner(entityCode As String, newOwner As Owner)
+
+   Call saveOwner(entityCode, newOwner)
    
 End Sub

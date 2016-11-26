@@ -12,11 +12,11 @@ Option Explicit
 '
 ' Services class - all service methods that are not part of any domain class
 '
-Private db  As Services_Db
+Private db  As Dba_Services
 
 Private Sub Class_Initialize()
 
-   Set db = New Services_Db
+   Set db = New Dba_Services
    
 End Sub
 
@@ -155,6 +155,12 @@ Public Sub deleteEntityPermanently(entityCode As String)
    db.deleteEntity (entityCode)
    
 End Sub
+
+Public Function getVersionId(entityCode As String, versionNro As String) As Long
+
+   getVersionId = DLookup("Id", ITEM_VERSION, "Item_Code = '" & entityCode & "' AND VersionNumber = '" & versionNro & "'")
+   
+End Function
 Private Sub Class_Terminate()
    
    Set db = Nothing

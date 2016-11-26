@@ -18,25 +18,24 @@ Option Explicit
 Private app             As Application_API
 Private oCode           As String
 Private oType           As String
-Private oNames          As Names_IF
-Private oOwners         As Owners_IF
+Private oNames          As If_Names
+Private oOwners         As If_Owners
 Private oProperties     As Properties
 Private oVersionNro     As String
 Private oNew            As Boolean
 
 Public Documents       As Documents
 
-Public Sub init(entityCode As String, entityType As String, versionNro As String, nameBehavior As Names_IF, ownerBehavior As Owners_IF)
+Public Sub init(entityCode As String, entityType As String, versionNro As String, nameBehavior As If_Names, ownerBehavior As If_Owners)
    
    Set app = New Application_API
    Set oNames = nameBehavior
    Set oOwners = ownerBehavior
-   Set Documents = New Documents
+   Set Documents = new_Documents(entityCode, versionNro)
    oCode = entityCode
    oType = entityType
    oVersionNro = versionNro
 
-   
    Set oProperties = new_Properties(entityCode, entityType)
       
 End Sub
@@ -57,20 +56,10 @@ End Function
 
 
 Public Function getName(language As String) As String
-'  Return entity version's name text or empty string if there is no name with the language yet
 
-   Dim nameObject   As EntityName
-
-   Set nameObject = oNames.getName(oCode, language)
-   
-   If nameObject Is Nothing Then
-      getName = ""
-   Else
-      getName = nameObject.getText
-   End If
+   getName = oNames.getName(language)
    
 End Function
-
 
 Public Function getOwner() As Owner
 
@@ -119,6 +108,11 @@ Public Function getLastDecision() As Decision
    
 End Function
 
+Public Function getDecision(decisionId As Long) As Decision
+
+   Set getDecision = app.Decisions.getDecision(decisionId)
+   
+End Function
 
 Public Function getNewDecision() As Decision
 ' Return a new decision object with default values
@@ -150,7 +144,7 @@ End Sub
 
 Public Sub setName(newNameText As String, language As String)
 
-   Call oNames.saveName(oCode, new_Name(newNameText, language))
+   Call oNames.saveName(new_Name(newNameText, language))
    
 End Sub
 
@@ -169,26 +163,18 @@ Public Sub setStatus(statusId As Integer, startDate As Date)
 End Sub
 
 
-Public Function Properties() As Properties
-' This is the old version - replaced by getProperty and setProperty methods.
+Public Function getProperty(propertyType As String) As Property
 
-   Set Properties = oProperties
-   
-End Function
-
-
-Public Function getProperty(propertyType as String) as Property
-
-	set getProperty = oProperties.getProperty(propertyType)
+        Set getProperty = oProperties.getProperty(propertyType)
 
 End Function
 
 
-public sub	setProperty(value as property)
+Public Sub setProperty(value As Property)
 
-	call oproperties.saveProperty(value)
-	
-end sub
+        Call oProperties.saveProperty(value)
+        
+End Sub
 
 
 Public Property Get isNew() As Boolean

@@ -14,11 +14,13 @@ Option Explicit
 '  This is an abstraction of status repository.
 
 Private app             As Application_API
+Private Services        As Services
 Private dbconn          As ADODB.Connection
 
 Public Sub init()
    
    Set app = New Application_API
+   Set Services = New Services
    Set dbconn = CurrentProject.Connection
    
 End Sub
@@ -56,7 +58,7 @@ Public Sub saveStatus(entityCode As String, versionNro As String, newStatus As S
    Dim currentStatus As Status
    Dim versionId     As Long
    
-   versionId = DLookup("Id", ITEM_VERSION, "Item_Code = '" & entityCode & "' AND VersionNumber = '" & versionNro & "'")
+   versionId = Services.getVersionId(entityCode, versionNro)
    Set currentStatus = Me.getStatus(entityCode, versionNro)
    
    If currentStatus Is Nothing Then
@@ -144,6 +146,7 @@ End Function
 Private Sub Class_Terminate()
 
    Set app = Nothing
+   Set Services = Nothing
    Set dbconn = Nothing
    
 End Sub

@@ -10,31 +10,40 @@ Attribute VB_Exposed = False
 Option Compare Database
 Option Explicit
 
-Implements Names_IF
+Implements If_Names
 
-Private db              As Names_db
-Private super           As Names_Abstract     ' Super class that implements common methods
+Private db              As Dba_Names
+Private super           As Abs_Names     ' Super class that implements common methods
 Private entityType      As String
 
 'constructor
-Public Sub init(entityType As String)
+Public Sub init(parentCode As String, parentType As String)
 
-   Set db = New Names_db
-   Set super = New Names_Abstract
-   entityType = entityType
-   super.init
+   Set db = New Dba_Names
+   Set super = New Abs_Names
+   Call super.init(parentCode, parentType)
+   entityType = parentType
    
 End Sub
 
-Private Function Names_IF_getName(entityCode As String, language As String) As EntityName
+Private Sub Class_Terminate()
+   
+   Set super = Nothing
+   Set db = Nothing
+   
+End Sub
+
+'---- METHODS -----------------------
+
+Private Function getName(language As String) As String
 ' Return a name object with actual name text or "empty" name text
 
-      Set Names_IF_getName = super.getName(entityCode, language)
+      getName = super.getName(language).getText
 
 End Function
 
 
-Private Sub Names_IF_saveName(entityCode As String, newName As EntityName)
+Private Sub saveName(newName As EntityName)
 ' Check that the name is unique among this entity type and
 ' create a new name record or update an existing one.
 
@@ -42,22 +51,20 @@ Private Sub Names_IF_saveName(entityCode As String, newName As EntityName)
       Err.Raise e.notUniqueName, , "Name is not unique under this context"
    End If
    
-   Call super.saveName(entityCode, newName)
+   Call super.saveName(newName)
    
 End Sub
 
+'---- INTERFACE CALLS -----------------------
 
-Private Function Names_IF_rsString(entityCode As String) As String
-' Method implementation is delegated to the super class.
+Private Function If_Names_getName(language As String) As String
 
-   Names_IF_rsString = db.getRowSourceOfEntityNames(entityCode)
-
+   If_Names_getName = getName(language)
+   
 End Function
 
+Private Sub If_Names_saveName(newName As EntityName)
 
-Private Sub Class_Terminate()
-   
-   Set super = Nothing
-   Set db = Nothing
+   Call saveName(newName)
    
 End Sub
