@@ -101,3 +101,9 @@ Public Sub saveDocReference(docRef As Document)
 End Sub
 
 
+Public Sub deleteDocReference(docRefId)
+
+   db.deleteDocReference (docRefId)
+   
+End Sub
+

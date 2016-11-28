@@ -38,7 +38,6 @@ Public clipBoard        As Collection   ' temporary storage for copy and paste
    Public Const BILLING_MAPPING       As String = "dbo_LegacyMapping"
    Public Const BILLING_STATUS        As String = "dbo_LegacyStatusMapping"
    Public Const BILLING_STATUS_NAME   As String = "dbo_LegacyStatusName"
-   Public Const PRICE_LINE            As String = "dbo_PriceLine"
    Public Const PROPERTY_TYPE         As String = "dbo_Properties"
    Public Const PROPERTY_VALUE        As String = "dbo_PropertyValues"
    Public Const ITEM_PROPERTY_VALUE   As String = "dbo_ItemPropertyValues"
@@ -46,6 +45,11 @@ Public clipBoard        As Collection   ' temporary storage for copy and paste
    Public Const GROUP_HIERARCHY          As String = "dbo_GroupHierarchy"
    Public Const DOC_REFERENCE         As String = "dbo_DocumentReference"
    Public Const DOC_TYPE              As String = "dbo_DocumentType"
+   Public Const PRICE_LINE            As String = "dbo_PriceLine"
+   Public Const PRICE_LINE_TEXT       As String = "dbo_PriceLineText"
+   Public Const BUSINESS_TYPE         As String = "dbo_BusinessType"
+   Public Const PRICE_LIST_ENTRY      As String = "dbo_PriceListEntry"
+   
     
     
     

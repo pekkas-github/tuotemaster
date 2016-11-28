@@ -82,7 +82,22 @@ Public Sub updateDocReference(docRef As Document)
 End Sub
 
 
-Public Sub deleteDocumentReference(docId As Long)
+Public Sub deleteDocReference(docId As Long)
 
+   Dim sql  As String
+   Dim rst  As New ADODB.Recordset
+   
+   sql = "SELECT * FROM " & DOC_REFERENCE & " WHERE Id = " & docId
+   
+   rst.Open sql, dbconn, adOpenDynamic, adLockPessimistic
+   
+   With rst
+      .Delete
+      .Update
+      .Close
+   End With
+   
+   Set rst = Nothing
+   
 End Sub
 

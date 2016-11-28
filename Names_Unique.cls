@@ -66,5 +66,5 @@ End Function
 Private Sub If_Names_saveName(newName As EntityName)
 
    Call saveName(newName)
-   
+
 End Sub

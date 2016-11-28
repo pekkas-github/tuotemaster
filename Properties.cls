@@ -35,7 +35,7 @@ Public Function getProperty(propertyType As String) As Property
 '  property object.
 
    Dim rst  As ADODB.Recordset
-   
+
    Set rst = db.getProperty(oEntityCode, propertyType)
    
    If rst.EOF Then   ' return a new one
