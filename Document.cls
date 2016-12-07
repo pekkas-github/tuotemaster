@@ -31,13 +31,13 @@ Public Function openDocument() As Boolean
 ' Return false value, if document is not found from URL location.
 ' Use VBA-class Application
     
-On Error GoTo catch
+On Error GoTo Catch
     
    Application.FollowHyperlink oURL
    openDocument = True
    Exit Function
 
-catch:
+Catch:
     ' Error if the document is not found
     openDocument = False
 

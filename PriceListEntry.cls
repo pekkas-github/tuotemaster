@@ -40,7 +40,7 @@ Public Sub init(priceLineId As String, priceListId As String, Optional Id As Lon
 '  CREATED 20.10.2015 in ver 6.2.0
 '  MODIFIED in ver 6.4.0 (added oActive, oValidFrom not Date+1)
 
-    On Error GoTo catch
+    On Error GoTo Catch
     
    oId = Id
    oPriceLineId = priceLineId
@@ -69,7 +69,7 @@ Public Sub init(priceLineId As String, priceListId As String, Optional Id As Lon
 exitproc:
     Exit Sub
     
-catch:
+Catch:
     Call errorMsg(1, "PriceListEntry.construct")
     Resume exitproc
     Resume
@@ -81,7 +81,7 @@ Public Sub populated(rst As ADODB.Recordset)
 '  MODIFIED in ver 6.2.1
 '  MODIFIED in ver 6.4.0 (added oActive)
 
-    On Error GoTo catch
+    On Error GoTo Catch
     
     oId = rst!Id
     oPriceLineId = rst!PriceLine_Id
@@ -106,7 +106,7 @@ Public Sub populated(rst As ADODB.Recordset)
 exitproc:
     Exit Sub
     
-catch:
+Catch:
     Call errorMsg(1, "PriceListEntry.populate")
     Resume exitproc
     Resume
@@ -115,14 +115,14 @@ End Sub
 Public Sub save()
 '   CREATED 20.10.2015 in ver 6.2.0
 
-    On Error GoTo catch
+    On Error GoTo Catch
     
     app.ObjectRepository.storePriceListEntry (Me)
 
 exitproc:
     Exit Sub
     
-catch:
+Catch:
     Call errorMsg(1, "PriceListEntry.save")
     Resume exitproc
     Resume

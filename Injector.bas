@@ -128,6 +128,18 @@ Public Function new_Owner(personId As Long, startDate As Date) As Owner
 End Function
 
 
+Public Function new_PriceLines(salesItemCode As String, versionNumber As String) As rep_PriceLines
+
+   Dim newRepo    As New rep_PriceLines
+   
+   Call newRepo.init(salesItemCode, versionNumber)
+   
+   Set new_PriceLines = newRepo
+   
+   Set newRepo = Nothing
+
+End Function
+
 Public Function new_Property(entityType As String, propertyType As String, valueId As String, isNew As Boolean) As Property
 
    Dim newProperty   As New Property

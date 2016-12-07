@@ -14,7 +14,7 @@ Option Explicit
 '
 Private oId                      As String
 Private oEntityVersionId         As Long     'not needed. Stored in repository
-Private oPriceLIneText           As String
+Private oPriceLineText           As String
 Private oBusinessTypeBasic       As String
 Private oBusinessTypeOverride    As String
 Private oSapCode                 As String
@@ -35,79 +35,12 @@ Private Sub Class_Initialize()
 
 End Sub
 Public Sub init(versionId As Long)
-'   CREATED 2.9.2015 in ver 6.2.0
 '   Constructs a new PriceLine object
-
-    On Error GoTo catch
     
     oEntityVersionId = versionId
 
-exitproc:
-    Exit Sub
-    
-catch:
-    Call errorMsg(1, "PriceLine.init")
-    Resume exitproc
-    Resume
 End Sub
 
-Public Sub load(priceLineData As ADODB.Recordset, priceLineTexts As ADODB.Recordset)
-'   CREATED 2.10.2015 in ver 6.2.0
-'   Populates attributes with values retreived from the database
-
-   On Error GoTo catch
-   
-   Dim tempText   As PriceLineText
-      
-'  Populate attributes
-   With priceLineData
-       oId = !Id
-       oEntityVersionId = !ItemVersion_Id
-       oBusinessTypeBasic = Nz(!BizTypeBasic_Id)
-       oBusinessTypeOverride = Nz(!BizTypeOverride_Id)
-       oSapCode = Nz(!SapCode)
-   End With
-   oStatusNew = False
-   oStatusModified = False
-   
-'  Populate price line text attributes
-   With priceLineTexts
-        While Not .EOF
-           Set tempText = New PriceLineText
-           Call tempText.init(!Content, !lang, False)
-           oPriceLineTexts.Add tempText, !lang
-           .MoveNext
-       Wend
-   End With
-       
-   
-exitproc:
-   Set tempText = Nothing
-   Exit Sub
-   
-catch:
-   Call errorMsg(1, "PriceLine.load")
-   Resume exitproc
-   Resume
-        
-End Sub
-
-Public Sub save()
-'   CREATED 3.10.2015 in ver 6.2.0
-
-    On Error GoTo catch
-    
-    Call app.ObjectRepository.storePriceLine(Me)
-
-exitproc:
-    Exit Sub
-    
-catch:
-    Call errorMsg(1, "PriceLine.save")
-    Resume exitproc
-    Resume
-    
-End Sub
 Private Sub Class_Terminate()
 
     Set oPriceLineTexts = Nothing
@@ -115,8 +48,7 @@ Private Sub Class_Terminate()
     
 End Sub
 
-Public Function getPriceListEntry(priceListId As String, action As String) As PriceListEntry
-'   CREATED 19.9.2015 in ver 6.2.0
+Public Function getPriceListEntry(priceListId As String, action As String) As priceListEntry
 '   Returns a priceListEntry object that is relevant for adding or updating.
 '   Requires that the priceLine is already persistent.
 '   Returned priceListEntry is either
@@ -125,18 +57,18 @@ Public Function getPriceListEntry(priceListId As String, action As String) As Pr
 '   - current priceListEntry itself (effective pricce, action = change)
 '   - coming priceListEntry itself  (coming price, action = any)
 
-    On Error GoTo catch
+    On Error GoTo Catch
     
     Dim activePriceListEntries  As Collection
-    Dim PriceListEntry          As PriceListEntry
-    Dim price                   As PriceListEntry
+    Dim priceListEntry          As priceListEntry
+    Dim price                   As priceListEntry
     Dim done                    As Boolean
     
     If oStatusNew Then Err.Raise 1   ' Price line is not persistent
 
 '   Create a new price object by default
-    Set PriceListEntry = New PriceListEntry
-    Call PriceListEntry.init(oId, priceListId)
+    Set priceListEntry = New priceListEntry
+    Call priceListEntry.init(oId, priceListId)
     
     done = False
     Set activePriceListEntries = app.ObjectRepository.findActivePriceListEntries(oId)
@@ -146,28 +78,28 @@ Public Function getPriceListEntry(priceListId As String, action As String) As Pr
       If price.getPriceListId = priceListId Then
 
          If price.getStatus = "coming" Then  'return the coming price object
-            Set PriceListEntry = price
+            Set priceListEntry = price
             done = True
 
          ElseIf Not done And action = "change" Then   'return the current price object
-            Set PriceListEntry = price
+            Set priceListEntry = price
 
          ElseIf Not done And action = "new" Then   'return a new cloned price object
-            Set PriceListEntry = app.ObjectFactory.clonePriceListEntry(price)
-            PriceListEntry.setValidFrom (Date)
-            PriceListEntry.setStatus ("coming")
+            Set priceListEntry = app.ObjectFactory.clonePriceListEntry(price)
+            priceListEntry.setValidFrom (Date)
+            priceListEntry.setStatus ("coming")
             
          End If
       End If
     Next
-    Set getPriceListEntry = PriceListEntry
+    Set getPriceListEntry = priceListEntry
     
 exitproc:
     Set activePriceListEntries = Nothing
-    Set PriceListEntry = Nothing
+    Set priceListEntry = Nothing
     Exit Function
     
-catch:
+Catch:
     If Err.number = 1 Then
         Err.Raise vbObjectError + 400, , "Save the price line first."
     Else
@@ -182,7 +114,7 @@ Public Function getPriceLineText() As String
 '   CREATED 31.8.2015 in ver. 6.2.0
 '   Returns price line's text
         
-    getPriceLineText = oPriceLIneText
+    getPriceLineText = oPriceLineText
         
 End Function
 
@@ -190,7 +122,7 @@ Public Sub setPriceLineText(PriceLineText As String)
 '   CREATED 31.8.2015 in ver. 6.2.0
 '   Modify or add a price line text
     
-    oPriceLIneText = PriceLineText
+    oPriceLineText = PriceLineText
     oStatusModified = True
         
 End Sub

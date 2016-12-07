@@ -22,28 +22,29 @@ Public Sub init(salesItemCode As String, salesItemVersion As String)
 End Sub
 
 
-Public Function createPriceLine() As PriceLine
+Public Function createPriceLine() As priceLine
 
-   Set createPriceLine = New PriceLine
+   Set createPriceLine = New priceLine
 
 End Function
 
 
-Public Function getPriceLine(priceLineCode As String) As PriceLine
+Public Function getPriceLine(priceLineCode As String) As priceLine
 
    Dim rst           As ADODB.Recordset
-   Dim objPriceLine  As PriceLine
+   Dim objPriceLine  As priceLine
    
    Set rst = db.getPriceLine(priceLineCode)
    
-   Set objPriceLine = New PriceLine
+   Set objPriceLine = New priceLine
 
    With objPriceLine
       .setObjectId (priceLineCode)
       .setPriceLineText (rst!Content)
       .setBusinessTypeBasic (rst!BizTypeBasic_Id)
       .setBusinessTypeOverride (rst!BizTypeOverride_Id)
-      .setSapCode (rst!SapCode)
+      .setSapCode (rst!sapCode)
+      .isNew = False
    End With
    
    Set getPriceLine = objPriceLine
@@ -52,8 +53,18 @@ Public Function getPriceLine(priceLineCode As String) As PriceLine
 End Function
 
 
-Public Sub savePriceLine(newPriceLine As PriceLine)
+Public Sub savePriceLine(newPriceLine As priceLine)
+   Dim app  As Application_API
+   Set app = New Application_API
 
+   If newPriceLine.isNew Then
+      newPriceLine.setObjectId (app.Services.getNextPriceLineCode)
+      Call db.insertPriceLine(newPriceLine, oVersionId)
+   Else
+      Call db.updatePriceLine(newPriceLine)
+   End If
 
+   Set app = Nothing
+   
 End Sub
 

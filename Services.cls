@@ -87,16 +87,16 @@ Public Function getLastVersionNumber(entityCode As String) As String
     Dim Minor           As Integer
     Dim m               As Integer
     Dim n               As Integer
-    Dim VersionNumber   As Variant
+    Dim versionNumber   As Variant
         
     Major = 0
     Minor = 0
     
     Set versionNumbers = db.GetVersionNumbers(entityCode)
     
-    For Each VersionNumber In versionNumbers
-        m = ParseVersionMajorPart(CStr(VersionNumber))
-        n = ParseVersionMinorPart(CStr(VersionNumber))
+    For Each versionNumber In versionNumbers
+        m = ParseVersionMajorPart(CStr(versionNumber))
+        n = ParseVersionMinorPart(CStr(versionNumber))
         
         If m = Major And n > Minor Then
             Minor = n
@@ -119,17 +119,17 @@ Public Function ConcatVersionNumber(Major As Integer, Minor As Integer) As Strin
     ConcatVersionNumber = CStr(Major) & "." & CStr(Minor)
 
 End Function
-Public Function ParseVersionMajorPart(VersionNumber As String) As Integer
+Public Function ParseVersionMajorPart(versionNumber As String) As Integer
 ' Palauttaa version "m.n" major osan lukuna m.
     
-    ParseVersionMajorPart = CInt(Left(VersionNumber, (InStr(1, VersionNumber, ".", 1) - 1)))
+    ParseVersionMajorPart = CInt(Left(versionNumber, (InStr(1, versionNumber, ".", 1) - 1)))
     
 End Function
 
-Public Function ParseVersionMinorPart(VersionNumber As String) As Integer
+Public Function ParseVersionMinorPart(versionNumber As String) As Integer
 ' Palauttaa version "m.n" minor osan lukuna n.
 
-    ParseVersionMinorPart = CInt(Right(VersionNumber, (Len(VersionNumber) - InStr(1, VersionNumber, ".", 1))))
+    ParseVersionMinorPart = CInt(Right(versionNumber, (Len(versionNumber) - InStr(1, versionNumber, ".", 1))))
     
 End Function
 

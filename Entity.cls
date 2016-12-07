@@ -121,6 +121,33 @@ Public Function getNewDecision() As Decision
         
 End Function
 
+Public Function getPriceLine(priceLineCode As String) As priceLine
+
+   Dim repo As rep_PriceLines
+   
+   Set repo = new_PriceLines(oCode, oVersionNro)
+   
+   If priceLineCode = "" Then
+      Set getPriceLine = repo.createPriceLine
+   Else
+      Set getPriceLine = repo.getPriceLine(priceLineCode)
+   End If
+   
+   Set repo = Nothing
+   
+End Function
+
+Public Sub setPriceLine(priceLine As priceLine)
+   
+   Dim repo As rep_PriceLines
+   
+   Set repo = new_PriceLines(oCode, oVersionNro)
+
+   Call repo.savePriceLine(priceLine)
+   
+   Set repo = Nothing
+   
+End Sub
 
 Public Sub setDecision(newDecision As Decision)
 ' Save a new decision for this entity version
