@@ -91,7 +91,7 @@ Public Function getLastDecision(entityCode As String, versionNro As String) As D
          Set lastDecision = Nothing
       Else
          Set lastDecision = new_Decision(False)
-         lastDecision.setId (!Id)
+         lastDecision.setId (!id)
          lastDecision.setAuthority (Nz(!authority))
          lastDecision.setDecisionText (Nz(!decisionText))
          lastDecision.setStartDate (!validFrom)

@@ -39,13 +39,13 @@ Public Function getPriceLine(priceLineCode As String) As ADODB.Recordset
 End Function
 
 
-Public Function getPriceListEntry(Id As Long) As ADODB.Recordset
+Public Function getPriceListEntry(id As Long) As ADODB.Recordset
 
     Dim sql As String
     Dim rst As New ADODB.Recordset
 
     sql = "SELECT * FROM " & PRICE_LIST_ENTRY & _
-          " WHERE Id = " & Id
+          " WHERE Id = " & id
     
     rst.Open sql, dbconn, adOpenDynamic, adLockPessimistic
     
@@ -94,7 +94,7 @@ Public Sub insertPriceLine(newPriceLine As priceLine, versionId As Long)
     With newPriceLine
 '     Add new price line
       rst.AddNew
-      rst!Id = .getObjectId
+      rst!id = .getObjectId
       rst!ItemVersion_Id = versionId
       rst!BizTypeBasic_Id = .getBusinessTypeBasic
       rst!BizTypeOverride_Id = .getBusinessTypeOverride

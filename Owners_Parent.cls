@@ -41,7 +41,7 @@ Private Function getOwner(entityCode As String) As Owner
    If rst.EOF Then
       Set getOwner = Nothing     ' no owners
    Else
-      Set getOwner = new_Owner(rst!Id, rst!startDate)
+      Set getOwner = new_Owner(rst!id, rst!startDate)
    End If
    
 End Function

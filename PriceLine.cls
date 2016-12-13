@@ -64,7 +64,7 @@ Public Function getPriceListEntry(priceListId As String, action As String) As pr
     Dim price                   As priceListEntry
     Dim done                    As Boolean
     
-    If oStatusNew Then Err.Raise 1   ' Price line is not persistent
+    If oStatusNew Then Err.Raise 1, , "Price line is not persistent"
 
 '   Create a new price object by default
     Set priceListEntry = New priceListEntry

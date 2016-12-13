@@ -35,14 +35,14 @@ Private Sub Class_Initialize()
     Set app = Tuotemaster_Application.getAPI
     
 End Sub
-Public Sub init(priceLineId As String, priceListId As String, Optional Id As Long = 0, Optional price As Single = 0, Optional priceUnit As String = "€/kk", Optional priceType As String = "RC", Optional startDate As Date = 0, Optional endDate As Date = "31.12.2050", Optional vma As Single = 0, Optional vmaBoost As Single = 0, Optional active As Boolean = True, Optional comment As String = "", Optional isNew As Boolean = True)
+Public Sub init(priceLineId As String, priceListId As String, Optional id As Long = 0, Optional price As Single = 0, Optional priceUnit As String = "€/kk", Optional priceType As String = "RC", Optional startDate As Date = 0, Optional endDate As Date = "31.12.2050", Optional vma As Single = 0, Optional vmaBoost As Single = 0, Optional active As Boolean = True, Optional comment As String = "", Optional isNew As Boolean = True)
 
 '  CREATED 20.10.2015 in ver 6.2.0
 '  MODIFIED in ver 6.4.0 (added oActive, oValidFrom not Date+1)
 
     On Error GoTo Catch
     
-   oId = Id
+   oId = id
    oPriceLineId = priceLineId
    oPriceListId = priceListId
    oPrice = price
@@ -83,7 +83,7 @@ Public Sub populated(rst As ADODB.Recordset)
 
     On Error GoTo Catch
     
-    oId = rst!Id
+    oId = rst!id
     oPriceLineId = rst!PriceLine_Id
     oPriceListId = rst!PriceList_Id
     oPrice = rst!price

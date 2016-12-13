@@ -54,7 +54,7 @@ Public Function insertDocReference(entityVersion As Long, docRef As Document) As
    rst!URL = docRef.getURL
    rst.Update
    
-   insertDocReference = rst!Id
+   insertDocReference = rst!id
    
    Set rst = Nothing
 

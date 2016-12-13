@@ -140,6 +140,17 @@ Public Function new_PriceLines(salesItemCode As String, versionNumber As String)
 
 End Function
 
+Public Function new_PriceListEntry(priceLineId As String, priceListId As String, Optional id As Long) As priceListEntry
+
+   Dim newPriceListEntry   As priceListEntry
+   
+   Call newPriceListEntry.init(priceLineId, priceListId)
+   Set new_PriceListEntry = newPriceListEntry
+   
+   Set newPriceListEntry = Nothing
+   
+End Function
+
 Public Function new_Property(entityType As String, propertyType As String, valueId As String, isNew As Boolean) As Property
 
    Dim newProperty   As New Property
