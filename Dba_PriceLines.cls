@@ -49,7 +49,7 @@ Public Function getPriceListEntry(id As Long) As ADODB.Recordset
     
     rst.Open sql, dbconn, adOpenDynamic, adLockPessimistic
     
-    Set getPriceListEntryById = rst
+    Set getPriceListEntry = rst
     
     Set rst = Nothing
 
