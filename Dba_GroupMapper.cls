@@ -11,27 +11,33 @@ Option Compare Database
 Option Explicit
 
 Private app    As Application_API
-Private dbconn As ADODB.Connection
+Private dbConn As ADODB.Connection
 
 
 Private Sub Class_Initialize()
-
+'TODO: Replace this with init
    Set app = New Application_API
-   Set dbconn = CurrentProject.Connection
+   Set dbConn = CurrentProject.Connection
    
 End Sub
 
+Public Sub init(conn As ADODB.Connection)
+   
+   Set app = New Application_API
+   Set dbConn = conn
+   
+End Sub
 
-Public Function isMappedToParent(ChildEntity As Object, parentEntity As Object) As Boolean
+Public Function isMappedToParent(childEntity As Object, parentEntity As Object) As Boolean
 ' Chack if the child is already mapped to the parent
 
     Dim rst As New ADODB.Recordset
     Dim sql As String
     
     sql = "SELECT * FROM " & GROUP_HIERARCHY & _
-          " WHERE Child_Code = '" & ChildEntity.getCode & "' AND Parent_Code = '" & parentEntity.getCode & "'"
+          " WHERE Child_Code = '" & childEntity.getCode & "' AND Parent_Code = '" & parentEntity.getCode & "'"
           
-    rst.Open sql, dbconn, adOpenKeyset
+    rst.Open sql, dbConn, adOpenKeyset
     
     If rst.EOF Then
         isMappedToParent = False
@@ -44,16 +50,16 @@ Public Function isMappedToParent(ChildEntity As Object, parentEntity As Object) 
 End Function
 
 
-Public Sub InsertInGroupHierarchy(ChildEntity As Object, parentEntity As Object)
+Public Sub insertInGroupHierarchy(childEntity As Object, parentEntity As Object)
 ' Maps the child group or item reference to the parent entity
 
     Dim rst As New ADODB.Recordset
     
-    rst.Open GROUP_HIERARCHY, dbconn, adOpenDynamic, adLockPessimistic
+    rst.Open GROUP_HIERARCHY, dbConn, adOpenDynamic, adLockPessimistic
     
     rst.AddNew
-    rst!Child_Code = ChildEntity.getCode
-    rst!Child_Type = ChildEntity.getType
+    rst!Child_Code = childEntity.getCode
+    rst!Child_Type = childEntity.getType
     rst!Parent_Code = parentEntity.getCode
     rst!Parent_Type = parentEntity.getType
     
@@ -64,7 +70,7 @@ Public Sub InsertInGroupHierarchy(ChildEntity As Object, parentEntity As Object)
 End Sub
 
 
-Public Sub deleteFromGroupHierarchy(ChildEntity As Object, parentEntity As Object)
+Public Sub deleteFromGroupHierarchy(childEntity As Object, parentEntity As Object)
 '   Cut the parent-child connection. Child branch stays orphan unless it is later
 '   connected to another parent group. Orphan groups are cleaned by garbage collection
 '   in "deleteOrphanGroupings" while closing the group mapper.
@@ -73,9 +79,9 @@ Public Sub deleteFromGroupHierarchy(ChildEntity As Object, parentEntity As Objec
     Dim sql As String
     
     sql = "SELECT * FROM " & GROUP_HIERARCHY & _
-          " WHERE Child_Code = '" & ChildEntity.getCode & "' AND Parent_Code = '" & parentEntity.getCode & "'"
+          " WHERE Child_Code = '" & childEntity.getCode & "' AND Parent_Code = '" & parentEntity.getCode & "'"
           
-    rst.Open sql, dbconn, , adLockPessimistic
+    rst.Open sql, dbConn, , adLockPessimistic
     rst.Delete
     rst.Update
 
@@ -100,7 +106,7 @@ Public Sub deleteOrphanGroups()
    
    Do
       Set rst = New ADODB.Recordset
-      rst.Open sql, dbconn, adOpenDynamic, adLockPessimistic
+      rst.Open sql, dbConn, adOpenDynamic, adLockPessimistic
       While Not rst.EOF
          rst.Delete
          rst.Update
@@ -117,7 +123,7 @@ Public Sub deleteOrphanGroups()
          "LEFT JOIN " & GROUP_HIERARCHY & " AS g ON i.Code = g.Child_Code " & _
          "WHERE g.Child_Code Is Null AND (i.Type = 'CAT' OR i.Type = 'GRP')"
          
-   rst.Open sql, dbconn, adOpenDynamic, adLockPessimistic
+   rst.Open sql, dbConn, adOpenDynamic, adLockPessimistic
    
    While Not rst.EOF
       Call app.Services.deleteEntityPermanently(rst!code)
@@ -129,7 +135,7 @@ Public Sub deleteOrphanGroups()
 End Sub
 Private Sub Class_Terminate()
 
-   Set dbconn = Nothing
+   Set dbConn = Nothing
    Set app = Nothing
    
 End Sub

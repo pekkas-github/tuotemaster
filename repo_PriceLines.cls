@@ -2,7 +2,7 @@ VERSION 1.0 CLASS
 BEGIN
   MultiUse = -1  'True
 END
-Attribute VB_Name = "rep_PriceLines"
+Attribute VB_Name = "repo_PriceLines"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
@@ -22,24 +22,36 @@ Public Sub init(salesItemCode As String, salesItemVersion As String)
 End Sub
 
 
-Public Function createPriceLine() As priceLine
+Public Function createPriceLine() As PriceLine
 
-   Set createPriceLine = New priceLine
+   Dim newPriceLine  As New PriceLine
+   Set newPriceLine = new_PriceLine
+   
+   With newPriceLine
+      .setBusinessTypeBasic ("NONE")
+      .setBusinessTypeOverride ("NONE_O")
+      .isNew = True
+      .isModified = False
+   End With
+   
+   Set createPriceLine = newPriceLine
 
+   Set newPriceLine = Nothing
+   
 End Function
 
 
-Public Function getPriceLine(priceLineCode As String) As priceLine
+Public Function getPriceLine(priceLineCode As String) As PriceLine
 
    Dim rst           As ADODB.Recordset
-   Dim objPriceLine  As priceLine
+   Dim objPriceLine  As PriceLine
    
    Set rst = db.getPriceLine(priceLineCode)
    
-   Set objPriceLine = New priceLine
+   Set objPriceLine = new_PriceLine
 
    With objPriceLine
-      .setObjectId (priceLineCode)
+      .setCode (priceLineCode)
       .setPriceLineText (rst!Content)
       .setBusinessTypeBasic (rst!BizTypeBasic_Id)
       .setBusinessTypeOverride (rst!BizTypeOverride_Id)
@@ -53,12 +65,12 @@ Public Function getPriceLine(priceLineCode As String) As priceLine
 End Function
 
 
-Public Sub savePriceLine(newPriceLine As priceLine)
+Public Sub savePriceLine(newPriceLine As PriceLine)
    Dim app  As Application_API
    Set app = New Application_API
 
    If newPriceLine.isNew Then
-      newPriceLine.setObjectId (app.Services.getNextPriceLineCode)
+      newPriceLine.setCode (app.Services.getNextPriceLineCode)
       Call db.insertPriceLine(newPriceLine, oVersionId)
    Else
       Call db.updatePriceLine(newPriceLine)

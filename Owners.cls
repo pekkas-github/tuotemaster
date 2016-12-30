@@ -10,13 +10,13 @@ Attribute VB_Exposed = True
 Option Compare Database
 Option Explicit
 
-Private dbconn       As ADODB.Connection
+Private dbConn       As ADODB.Connection
 
 
 'constructor
 Public Sub init()
 
-   Set dbconn = CurrentProject.Connection
+   Set dbConn = CurrentProject.Connection
    
 End Sub
 
@@ -32,7 +32,7 @@ Public Function getItem(entityCode As String) As Owner
          " WHERE Item_Code = '" & entityCode & "' " & _
          "AND Valid_From <= " & TODAY & " AND Valid_To > " & TODAY
    
-   rst.Open sql, dbconn, adOpenDynamic, adLockPessimistic
+   rst.Open sql, dbConn, adOpenDynamic, adLockPessimistic
 
    If rst.EOF Then
       Set getItem = Nothing
@@ -76,7 +76,7 @@ Private Sub insertOwner(entityCode As String, newOwner As Owner)
 
    Dim rst  As New ADODB.Recordset
    
-   rst.Open "ItemOwner", dbconn, adOpenDynamic, adLockPessimistic
+   rst.Open "ItemOwner", dbConn, adOpenDynamic, adLockPessimistic
    
    With rst
       .AddNew
@@ -104,7 +104,7 @@ Private Sub updateOwner(entityCode As String, currentOwner As Owner)
          " WHERE Item_Code = '" & entityCode & "' " & _
          "AND Valid_From <= " & TODAY & " AND Valid_To > " & TODAY
          
-   rst.Open sql, dbconn, adOpenDynamic, adLockPessimistic
+   rst.Open sql, dbConn, adOpenDynamic, adLockPessimistic
    
    rst!Party_Id = currentOwner.getPersonId
    rst!valid_to = currentOwner.getEndDate
@@ -148,6 +148,6 @@ End Function
 
 Private Sub Class_Terminate()
 
-   Set dbconn = Nothing
+   Set dbConn = Nothing
    
 End Sub

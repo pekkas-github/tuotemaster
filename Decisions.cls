@@ -19,14 +19,14 @@ Option Explicit
 
 Private app                As Application_API
 Private Services           As Services
-Private dbconn             As ADODB.Connection
+Private dbConn             As ADODB.Connection
 
 
 Public Sub init()
 
    Set app = New Application_API
    Set Services = New Services
-   Set dbconn = CurrentProject.Connection
+   Set dbConn = CurrentProject.Connection
    
 End Sub
 
@@ -50,7 +50,7 @@ Public Function getDecision(decisionId As Long) As Decision
          "FROM " & VERSION_DECISION & _
          " WHERE Id = " & decisionId
          
-   rst.Open sql, dbconn, adOpenDynamic, adLockPessimistic
+   rst.Open sql, dbConn, adOpenDynamic, adLockPessimistic
    
    Set dec = new_Decision(False)
    
@@ -58,8 +58,8 @@ Public Function getDecision(decisionId As Long) As Decision
       dec.setId (decisionId)
       dec.setAuthority (Nz(!authority))
       dec.setDecisionText (Nz(!decisionText))
-      dec.setStartDate (!validFrom)
-      dec.setEndDate (!validTo)
+      dec.setStartDate (!ValidFrom)
+      dec.setEndDate (!ValidTo)
    End With
    
    Set getDecision = dec
@@ -84,7 +84,7 @@ Public Function getLastDecision(entityCode As String, versionNro As String) As D
          "WHERE v.Item_Code =  '" & entityCode & "' AND v.VersionNumber = '" & versionNro & "' " & _
          "AND ValidFrom <= " & TODAY & " AND " & TODAY & " < ValidTo"
    
-   rst.Open sql, dbconn, adOpenDynamic, adLockPessimistic
+   rst.Open sql, dbConn, adOpenDynamic, adLockPessimistic
    
    With rst
          If .EOF Then
@@ -94,8 +94,8 @@ Public Function getLastDecision(entityCode As String, versionNro As String) As D
          lastDecision.setId (!id)
          lastDecision.setAuthority (Nz(!authority))
          lastDecision.setDecisionText (Nz(!decisionText))
-         lastDecision.setStartDate (!validFrom)
-         lastDecision.setEndDate (!validTo)
+         lastDecision.setStartDate (!ValidFrom)
+         lastDecision.setEndDate (!ValidTo)
       End If
    End With
    
@@ -147,14 +147,14 @@ Private Sub insertDecisionData(newDecision As Decision, versionId As Long)
 
    Dim rst        As New ADODB.Recordset
    
-   rst.Open VERSION_DECISION, dbconn, adOpenDynamic, adLockPessimistic
+   rst.Open VERSION_DECISION, dbConn, adOpenDynamic, adLockPessimistic
    
    With rst
       .AddNew
       !decisionText = Nz(newDecision.getDecisionText)
       !authority = Nz(newDecision.getAuthority)
-      !validFrom = newDecision.getStartDate
-      !validTo = newDecision.getEndDate
+      !ValidFrom = newDecision.getStartDate
+      !ValidTo = newDecision.getEndDate
       !ItemVersion_Id = versionId
       .Update
       newDecision.isNew = False
@@ -173,12 +173,12 @@ Private Sub updateDecisionData(modDecision As Decision)
    
    sql = "SELECT * FROM " & VERSION_DECISION & " WHERE Id = " & modDecision.getId
    
-   rst.Open sql, dbconn, adOpenDynamic, adLockPessimistic
+   rst.Open sql, dbConn, adOpenDynamic, adLockPessimistic
    
    With rst
       !decisionText = Nz(modDecision.getDecisionText)
       !authority = Nz(modDecision.getAuthority)
-      !validTo = modDecision.getEndDate
+      !ValidTo = modDecision.getEndDate
       .Update
       modDecision.isNew = False
    End With
@@ -211,6 +211,6 @@ Private Sub Class_Terminate()
 
    Set app = Nothing
    Set Services = Nothing
-   Set dbconn = Nothing
+   Set dbConn = Nothing
    
 End Sub

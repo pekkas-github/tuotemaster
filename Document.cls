@@ -20,7 +20,7 @@ Private oURL         As String
 Private oPersistent  As Boolean
 Private oModified    As Boolean
 
-Public Sub init(docType As String)
+Public Sub init()
                 
         
 End Sub

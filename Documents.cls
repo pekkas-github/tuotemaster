@@ -41,7 +41,7 @@ Public Function getDocReference(docId As Long) As Document
    Dim docRef     As Document
    
    Set docRst = db.getDocument(docId)
-   Set docRef = New Document
+   Set docRef = new_Document
    
    If docRst.EOF Then Err.Raise recordnotfound, , "Document reference not found"
    
@@ -67,7 +67,7 @@ Public Function createDocReference() As Document
 
    Dim docRef      As Document
    
-   Set docRef = New Document
+   Set docRef = new_Document
    
    With docRef
       .setName ("New document reference")

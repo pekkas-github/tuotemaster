@@ -43,14 +43,14 @@ Public Sub cut(parentEntity As Entity, childEntities As Collection)
 ' Parent may be ROOT, CAT or GRP.
 ' Collection remains on clipboard until next cut, copy or garbage collection takes place.
 
-    Dim ChildEntity As Entity
+    Dim childEntity As Entity
     
     cutPending = True
     Set Globals.clipBoard = New Collection
     
-    For Each ChildEntity In childEntities
-        Call unMap(ChildEntity, parentEntity)
-        Globals.clipBoard.Add ChildEntity
+    For Each childEntity In childEntities
+        Call unMap(childEntity, parentEntity)
+        Globals.clipBoard.Add childEntity
     Next
             
 End Sub
@@ -61,16 +61,16 @@ Public Sub paste(parentEntity As Entity)
 ' Before pasting check that it is allowed for child type and parent sub type match.
 ' Cut (or copied) collection remains on clipboard.
 
-    Dim ChildEntity     As Entity
+    Dim childEntity     As Entity
     Dim parentSubType   As String
     Dim childType       As String
     
     parentSubType = parentEntity.getProperty("SUB_MEM").getValue
     
-    For Each ChildEntity In Globals.clipBoard
-        childType = ChildEntity.getType
+    For Each childEntity In Globals.clipBoard
+        childType = childEntity.getType
         If parentSubType = childType Then
-            Call map(ChildEntity, parentEntity)
+            Call map(childEntity, parentEntity)
         Else
             Err.Raise vbObjectError + 513, , "Parent and child items are incompatible."
         End If
@@ -85,12 +85,12 @@ Public Sub copy(childEntities As Collection)
 ' Copy all child groups selected in the collection.
 ' Collection remains on clipboard until next cut, copy or garbage collection takes place.
 
-    Dim ChildEntity As Entity
+    Dim childEntity As Entity
     
     Set Globals.clipBoard = New Collection
     
-    For Each ChildEntity In childEntities
-        Globals.clipBoard.Add ChildEntity
+    For Each childEntity In childEntities
+        Globals.clipBoard.Add childEntity
     Next
 
         cutPending = False
@@ -98,22 +98,22 @@ Public Sub copy(childEntities As Collection)
 End Sub
 
 
-Public Sub unMap(ChildEntity As Entity, parentEntity As Entity)
+Public Sub unMap(childEntity As Entity, parentEntity As Entity)
 '   Disconnect this child entity from its parent entity
 
-    Call db.deleteFromGroupHierarchy(ChildEntity, parentEntity)
+    Call db.deleteFromGroupHierarchy(childEntity, parentEntity)
     
 End Sub
 
 
-Public Sub map(ChildEntity As Entity, parentEntity As Entity)
+Public Sub map(childEntity As Entity, parentEntity As Entity)
 '   Connect the child entity under the selected entity
     
     'If item is already mapped then skip
-    If db.isMappedToParent(ChildEntity, parentEntity) Then Exit Sub
+    If db.isMappedToParent(childEntity, parentEntity) Then Exit Sub
     
     'Otherwise connect item to the parent
-    Call db.InsertInGroupHierarchy(ChildEntity, parentEntity)
+    Call db.insertInGroupHierarchy(childEntity, parentEntity)
         
 End Sub
 

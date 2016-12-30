@@ -18,12 +18,12 @@ Private parentCode   As String
 Private parentType   As String
 '
 
-Public Sub init(pCode As String, pType As String)
+Public Sub init(entityCode As String, entityType As String)
 ' constructor
 
    Set db = New Dba_Names
-   parentCode = pCode
-   parentType = pType
+   parentCode = entityCode
+   parentType = entityType
    
 End Sub
 

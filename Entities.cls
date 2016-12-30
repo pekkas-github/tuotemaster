@@ -13,20 +13,20 @@ Option Explicit
 '  This class is the abstraction of all entities of a certain type
 
 Private app          As Application_API
-Private dbconn       As ADODB.Connection
+Private dbConn       As ADODB.Connection
 
 
 Public Sub init()
 
    Set app = New Application_API
-   Set dbconn = CurrentProject.Connection
+   Set dbConn = CurrentProject.Connection
    
 End Sub
 
 Private Sub Class_Terminate()
 
    Set app = Nothing
-   Set dbconn = Nothing
+   Set dbConn = Nothing
 
 End Sub
 
@@ -64,7 +64,7 @@ Public Sub createVersion(entityCode As String, versionNro As String)
 
    Dim rst        As New ADODB.Recordset
    
-   rst.Open ITEM_VERSION, dbconn, adOpenDynamic, adLockPessimistic
+   rst.Open ITEM_VERSION, dbConn, adOpenDynamic, adLockPessimistic
    
    With rst
       .AddNew
@@ -92,7 +92,7 @@ Public Function getEntity(entityCode As String, Optional versionNro As String = 
 '  Get entity data form database and init the entity object
    sql = "SELECT * FROM " & CORE_ITEM & " WHERE Code = '" & entityCode & "'"
    
-   rst.Open sql, dbconn, adOpenDynamic, adLockPessimistic
+   rst.Open sql, dbConn, adOpenDynamic, adLockPessimistic
    
    Set newEntity = new_Entity(entityCode, rst!Type, versionNro)
    newEntity.isNew = False
@@ -116,11 +116,11 @@ Public Sub saveEntity(newEntity As Entity)
    
    With rst
       If newEntity.isNew Then
-         .Open CORE_ITEM, dbconn, adOpenDynamic, adLockPessimistic
+         .Open CORE_ITEM, dbConn, adOpenDynamic, adLockPessimistic
          .AddNew
       Else
          sql = "SELECT * FROM " & CORE_ITEM & " WHERE Code = '" & newEntity & "'"
-         .Open sql, dbconn, adOpenDynamic, adLockPessimistic
+         .Open sql, dbConn, adOpenDynamic, adLockPessimistic
       End If
       
       !code = newEntity.getCode

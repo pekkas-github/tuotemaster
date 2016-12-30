@@ -10,12 +10,19 @@ Attribute VB_Exposed = False
 Option Compare Database
 Option Explicit
 
-Private dbconn As ADODB.Connection
+Private dbConn As ADODB.Connection
 
 Private Sub Class_Initialize()
+'TODO: Replace with init
 
-   Set dbconn = CurrentProject.Connection
+   Set dbConn = CurrentProject.Connection
    
+End Sub
+
+
+Public Sub init(conn As ADODB.Connection)
+   Set dbConn = conn
+
 End Sub
 
 Public Function getPriceLine(priceLineCode As String) As ADODB.Recordset
@@ -31,7 +38,7 @@ Public Function getPriceLine(priceLineCode As String) As ADODB.Recordset
       "INNER JOIN " & PRICE_LINE_TEXT & " AS t ON p.Id = t.PriceLine_Id " & _
       "WHERE p.Id = '" & priceLineCode & "' AND t.Lang = 'fin'"
     
-   rst.Open sql, dbconn, adOpenDynamic, adLockPessimistic
+   rst.Open sql, dbConn, adOpenDynamic, adLockPessimistic
    
    Set getPriceLine = rst
    Set rst = Nothing
@@ -47,7 +54,7 @@ Public Function getPriceListEntry(id As Long) As ADODB.Recordset
     sql = "SELECT * FROM " & PRICE_LIST_ENTRY & _
           " WHERE Id = " & id
     
-    rst.Open sql, dbconn, adOpenDynamic, adLockPessimistic
+    rst.Open sql, dbConn, adOpenDynamic, adLockPessimistic
     
     Set getPriceListEntry = rst
     
@@ -56,45 +63,57 @@ Public Function getPriceListEntry(id As Long) As ADODB.Recordset
 End Function
 
 
-Public Function getActivePriceListEntries(priceLineId As String, Optional priceListId As String = "NONE") As ADODB.Recordset
-'   Returns per each priceList or from a selected priceList a recordset with
-'   - no records if there is no effective or coming priceListEntries
-'   - all records where validTo date is greater or equal to today i.e. current or coming priceListEntry
+Public Function getCurrentPriceListEntry(priceLineCode As String) As ADODB.Recordset
+'   Return currently valid price list entry; cases:
+'   - no records if there is no priceListEntries
+'   - data of the current priceListEntry in STD pricelist
 
     Dim sql As String
     Dim rst As New ADODB.Recordset
     
     sql = "SELECT * FROM " & PRICE_LIST_ENTRY & _
-          " WHERE PriceLine_Id = '" & priceLineId & "' " & _
-          "AND validTo > " & TODAY & "-1 "
+          " WHERE PriceLine_Id = '" & priceLineCode & "' " & _
+          "AND ValidFrom <= " & TODAY & " AND ValidTo > " & TODAY & "-1 "
+              
+    rst.Open sql, dbConn, adOpenDynamic, adLockPessimistic
     
-'   Get from all priceLists or from a specific one
-    If Not priceListId = "NONE" Then
-        sql = sql & "AND PriceList_Id = '" & priceListId & "' "
-    End If
-    
-'   Group each priceList with latest priceEntry first
-    sql = sql & "ORDER BY PriceList_Id, ValidTo DESC"
-          
-    rst.Open sql, dbconn, adOpenDynamic, adLockPessimistic
-    
-    Set getActivePriceListEntries = rst
+    Set getCurrentPriceListEntry = rst
     Set rst = Nothing
     
 
 End Function
 
 
-Public Sub insertPriceLine(newPriceLine As priceLine, versionId As Long)
+Public Function getLatestPriceListEntry(priceLineCode As String) As ADODB.Recordset
+'   Return the latest price list entry; cases:
+'   - no records if there is no priceListEntries
+'   - data of the current priceListEntry in STD pricelist
+'   - data of a future priceListEntry in STD priceList
+
+    Dim sql As String
+    Dim rst As New ADODB.Recordset
+    
+    sql = "SELECT * FROM " & PRICE_LIST_ENTRY & _
+          " WHERE PriceLine_Id = '" & priceLineCode & "' " & _
+          "ORDER BY Id DESC"
+
+'  The latest will be on the top of the recordset
+    rst.Open sql, dbConn, adOpenDynamic, adLockPessimistic
+    
+    Set getLatestPriceListEntry = rst
+    Set rst = Nothing
+
+End Function
+Public Sub insertPriceLine(newPriceLine As PriceLine, versionId As Long)
     
     Dim rst As New ADODB.Recordset
     
-    rst.Open PRICE_LINE, dbconn, adOpenDynamic, adLockPessimistic
+    rst.Open PRICE_LINE, dbConn, adOpenDynamic, adLockPessimistic
     
     With newPriceLine
 '     Add new price line
       rst.AddNew
-      rst!id = .getObjectId
+      rst!id = .getCode
       rst!ItemVersion_Id = versionId
       rst!BizTypeBasic_Id = .getBusinessTypeBasic
       rst!BizTypeOverride_Id = .getBusinessTypeOverride
@@ -102,9 +121,9 @@ Public Sub insertPriceLine(newPriceLine As priceLine, versionId As Long)
       rst.Update
       rst.Close
 '     Add new price line text
-      rst.Open PRICE_LINE_TEXT, dbconn, adOpenDynamic, adLockPessimistic
+      rst.Open PRICE_LINE_TEXT, dbConn, adOpenDynamic, adLockPessimistic
       rst.AddNew
-      rst!PriceLine_Id = .getObjectId
+      rst!PriceLine_Id = .getCode
       rst!lang = "fin"
       rst!Content = .getPriceLineText
       rst.Update
@@ -115,14 +134,14 @@ Public Sub insertPriceLine(newPriceLine As priceLine, versionId As Long)
     
 End Sub
 
-Public Sub updatePriceLine(newPriceLine As priceLine)
+Public Sub updatePriceLine(newPriceLine As PriceLine)
 
     Dim rst As New ADODB.Recordset
     Dim sql As String
     
 '  Update price line
-   sql = "SELECT * FROM " & PRICE_LINE & " WHERE Id = '" & newPriceLine.getObjectId & "'"
-   rst.Open sql, dbconn, adOpenDynamic, adLockPessimistic
+   sql = "SELECT * FROM " & PRICE_LINE & " WHERE Id = '" & newPriceLine.getCode & "'"
+   rst.Open sql, dbConn, adOpenDynamic, adLockPessimistic
     
    With newPriceLine
       rst!BizTypeBasic_Id = .getBusinessTypeBasic
@@ -134,8 +153,8 @@ Public Sub updatePriceLine(newPriceLine As priceLine)
 
 '  Update price line text
    sql = "SELECT * FROM " & PRICE_LINE_TEXT & _
-         " WHERE PriceLine_Id = '" & newPriceLine.getObjectId & "' AND Lang ='fin'"
-   rst.Open sql, dbconn, adOpenDynamic, adLockPessimistic
+         " WHERE PriceLine_Id = '" & newPriceLine.getCode & "' AND Lang ='fin'"
+   rst.Open sql, dbConn, adOpenDynamic, adLockPessimistic
    
    rst!Content = newPriceLine.getPriceLineText
    rst.Update
@@ -144,3 +163,58 @@ Public Sub updatePriceLine(newPriceLine As priceLine)
 
 End Sub
 
+
+Public Sub insertPriceListEntry(priceEntry As PriceListEntry)
+
+   Dim rst  As New ADODB.Recordset
+   
+   rst.Open PRICE_LIST_ENTRY, dbConn, adOpenDynamic, adLockPessimistic
+   
+   With rst
+      .AddNew
+      !PriceLine_Id = priceEntry.getPriceLineId
+      !PriceList_Id = priceEntry.getPriceListId
+      !price = priceEntry.getPrice
+      !priceUnit = priceEntry.getUnit
+      !priceType = priceEntry.getType
+      !ValidFrom = priceEntry.getValidFrom
+      !ValidTo = priceEntry.getValidTo
+      !vma = priceEntry.getVMA
+      !VMA_boost = priceEntry.getVMABoost
+      !active = priceEntry.getActivity
+      !comment = priceEntry.getComment
+      .Update
+      .Close
+   End With
+   
+   Set rst = Nothing
+   
+End Sub
+
+
+Public Sub updatePriceListEntry(priceEntry As PriceListEntry)
+
+   Dim sql  As String
+   Dim rst  As New ADODB.Recordset
+   
+   sql = "SELECT * FROM " & PRICE_LIST_ENTRY & " WHERE Id = " & priceEntry.getId
+   
+   rst.Open sql, dbConn, adOpenDynamic, adLockPessimistic
+   
+   With rst
+      !price = priceEntry.getPrice
+      !priceUnit = priceEntry.getUnit
+      !priceType = priceEntry.getType
+      !ValidFrom = priceEntry.getValidFrom
+      !ValidTo = priceEntry.getValidTo
+      !vma = priceEntry.getVMA
+      !VMA_boost = priceEntry.getVMABoost
+      !active = priceEntry.getActivity
+      !comment = priceEntry.getComment
+      .Update
+      .Close
+   End With
+   
+   Set rst = Nothing
+   
+End Sub

@@ -15,13 +15,13 @@ Option Explicit
 
 Private app             As Application_API
 Private Services        As Services
-Private dbconn          As ADODB.Connection
+Private dbConn          As ADODB.Connection
 
 Public Sub init()
    
    Set app = New Application_API
    Set Services = New Services
-   Set dbconn = CurrentProject.Connection
+   Set dbConn = CurrentProject.Connection
    
 End Sub
 
@@ -39,7 +39,7 @@ Public Function getStatus(entityCode As String, versionNro As String) As Status
          "WHERE v.Item_Code = '" & entityCode & "' AND v.VersionNumber = '" & versionNro & "' " & _
          "AND s.Valid_From <= " & TODAY & " AND s.Valid_To > " & TODAY
    
-   rst.Open sql, dbconn, adOpenDynamic, adLockPessimistic
+   rst.Open sql, dbConn, adOpenDynamic, adLockPessimistic
    
    If rst.EOF Then                     'current status is empty
       Set getStatus = Nothing
@@ -82,7 +82,7 @@ Private Sub insertStatusData(versionId As Long, newStatus As Status)
 
    Dim rst  As New ADODB.Recordset
    
-   rst.Open VERSION_STATUS, dbconn, adOpenDynamic, adLockPessimistic
+   rst.Open VERSION_STATUS, dbConn, adOpenDynamic, adLockPessimistic
    
    With rst
       .AddNew
@@ -109,7 +109,7 @@ Private Sub updateStatusData(versionId As Long, currentStatus As Status)
    sql = "SELECT * FROM " & VERSION_STATUS & " WHERE ItemVersion_Id = " & versionId & _
          " AND Valid_From <= " & TODAY & " AND " & TODAY & " < Valid_To"
    
-   rst.Open sql, dbconn, adOpenDynamic, adLockPessimistic
+   rst.Open sql, dbConn, adOpenDynamic, adLockPessimistic
    
    With rst
       !StatusName_Id = Nz(currentStatus.getType)
@@ -147,6 +147,6 @@ Private Sub Class_Terminate()
 
    Set app = Nothing
    Set Services = Nothing
-   Set dbconn = Nothing
+   Set dbConn = Nothing
    
 End Sub

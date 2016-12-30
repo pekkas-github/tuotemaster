@@ -10,12 +10,16 @@ Attribute VB_Exposed = False
 Option Compare Database
 Option Explicit
 
-Private dbconn    As ADODB.Connection
-
+Private dbConn    As ADODB.Connection
 
 Private Sub Class_Initialize()
+'TODO: Replace this with init in all places where is new Dba_Documents
+   Set dbConn = CurrentProject.Connection
+End Sub
 
-        Set dbconn = CurrentProject.Connection
+Public Sub init(conn As ADODB.Connection)
+
+   Set dbConn = conn
         
 End Sub
 
@@ -31,7 +35,7 @@ Public Function getDocument(docId As Long) As ADODB.Recordset
           "INNER JOIN " & DOC_TYPE & " AS typ ON ref.DocumentType_Id = typ.Id " & _
           "WHERE ref.Id = " & docId
     
-    rst.Open sql, dbconn, adOpenDynamic, adLockPessimistic
+    rst.Open sql, dbConn, adOpenDynamic, adLockPessimistic
     Set getDocument = rst
     Set rst = Nothing
 
@@ -44,7 +48,7 @@ Public Function insertDocReference(entityVersion As Long, docRef As Document) As
 
    Dim rst As New ADODB.Recordset
    
-   rst.Open DOC_REFERENCE, dbconn, adOpenDynamic, adLockPessimistic
+   rst.Open DOC_REFERENCE, dbConn, adOpenDynamic, adLockPessimistic
    
    rst.AddNew
    rst!ItemVersion_Id = entityVersion
@@ -67,7 +71,7 @@ Public Sub updateDocReference(docRef As Document)
    Dim sql As String
    
    sql = "SELECT * FROM " & DOC_REFERENCE & " WHERE Id = " & docRef.getId
-   rst.Open sql, dbconn, adOpenDynamic, adLockPessimistic
+   rst.Open sql, dbConn, adOpenDynamic, adLockPessimistic
    
    With rst
       !DocumentType_id = docRef.getType
@@ -89,7 +93,7 @@ Public Sub deleteDocReference(docId As Long)
    
    sql = "SELECT * FROM " & DOC_REFERENCE & " WHERE Id = " & docId
    
-   rst.Open sql, dbconn, adOpenDynamic, adLockPessimistic
+   rst.Open sql, dbConn, adOpenDynamic, adLockPessimistic
    
    With rst
       .Delete

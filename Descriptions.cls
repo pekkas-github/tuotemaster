@@ -12,13 +12,13 @@ Option Explicit
 
 Private app          As Application_API
 Private Services     As Services
-Private dbconn       As ADODB.Connection
+Private dbConn       As ADODB.Connection
 
 Public Sub init()
 
    Set app = New Application_API
    Set Services = New Services
-   Set dbconn = CurrentProject.Connection
+   Set dbConn = CurrentProject.Connection
    
 End Sub
 
@@ -34,7 +34,7 @@ Public Function getDescription(entityCode As String, versionNro As String, langu
          "FROM " & VERSION_DESCRIPTION & " AS d INNER JOIN " & ITEM_VERSION & " AS v ON v.Id = d.ItemVersion_Id " & _
          "WHERE v.Item_Code = '" & entityCode & "' AND v.VersionNumber = '" & versionNro & "' AND Lang_Code = '" & language & "'"
          
-   rst.Open sql, dbconn, adOpenDynamic, adLockPessimistic
+   rst.Open sql, dbConn, adOpenDynamic, adLockPessimistic
    
    If rst.EOF Then
       Set getDescription = Nothing
@@ -76,7 +76,7 @@ Private Sub insertDescription(versionId As Long, newDescription As description)
 
    Dim rst        As New ADODB.Recordset
    
-   rst.Open VERSION_DESCRIPTION, dbconn, adOpenDynamic, adLockPessimistic
+   rst.Open VERSION_DESCRIPTION, dbConn, adOpenDynamic, adLockPessimistic
 
    rst.AddNew
    rst!description = newDescription.getText
@@ -98,7 +98,7 @@ Private Sub updateDescription(versionId As Long, currentDescription As descripti
          " WHERE ItemVersion_Id = " & versionId & _
          " AND Lang_Code = '" & currentDescription.getLanguage & "'"
          
-   rst.Open sql, dbconn, adOpenDynamic, adLockPessimistic
+   rst.Open sql, dbConn, adOpenDynamic, adLockPessimistic
 
    rst!description = currentDescription.getText
    rst.Update
@@ -126,6 +126,6 @@ Public Sub Class_Terminate()
    
    Set app = Nothing
    Set Services = Nothing
-   Set dbconn = Nothing
+   Set dbConn = Nothing
    
 End Sub

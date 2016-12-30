@@ -10,12 +10,19 @@ Attribute VB_Exposed = False
 Option Compare Database
 Option Explicit
 
-Private dbconn As ADODB.Connection
+Private dbConn As ADODB.Connection
 
 Private Sub Class_Initialize()
+'TODO: Replace with init
+
+   Set dbConn = CurrentProject.Connection
    
-   Set dbconn = CurrentProject.Connection
-   
+End Sub
+
+
+Public Sub init(conn)
+   Set dbConn = conn
+
 End Sub
 Public Function getLastPriceLineCode() As String
 ' Return the code of the last record in PriceLine table (C0000nnn)
@@ -54,7 +61,7 @@ Public Function GetVersionNumbers(entityCode As String) As Collection
           "INNER JOIN " & ITEM_VERSION & " AS v ON v.Item_Code = i.Code " & _
           "WHERE i.Code = '" & entityCode & "'"
           
-    rst.Open sql, dbconn, adOpenDynamic, adLockPessimistic
+    rst.Open sql, dbConn, adOpenDynamic, adLockPessimistic
     
     While Not rst.EOF
         number = rst(0)
@@ -82,7 +89,7 @@ Public Function getVersionIds(entityCode As String) As Collection
          "INNER JOIN " & ITEM_VERSION & " AS v ON v.Item_Code = i.Code " & _
          "WHERE i.Code = '" & entityCode & "'"
           
-   rst.Open sql, dbconn, adOpenDynamic, adLockPessimistic
+   rst.Open sql, dbConn, adOpenDynamic, adLockPessimistic
    Set col = New Collection
    
    While Not rst.EOF
@@ -104,7 +111,7 @@ Public Sub deleteNames(entityCode As String)
    
    sql = "SELECT * FROM " & ITEM_NAME & " WHERE Item_Code = '" & entityCode & "'"
    
-   rst.Open sql, dbconn, adOpenDynamic, adLockPessimistic
+   rst.Open sql, dbConn, adOpenDynamic, adLockPessimistic
    
    While Not rst.EOF
       rst.Delete
@@ -123,7 +130,7 @@ Public Sub deleteOwners(entityCode As String)
    
    sql = "SELECT * FROM " & ITEM_OWNER & " WHERE Item_Code = '" & entityCode & "'"
    
-   rst.Open sql, dbconn, adOpenDynamic, adLockPessimistic
+   rst.Open sql, dbConn, adOpenDynamic, adLockPessimistic
    
    While Not rst.EOF
       rst.Delete
@@ -142,7 +149,7 @@ Public Sub deleteDescriptions(verId As Long)
    
    sql = "SELECT * FROM " & VERSION_DESCRIPTION & " WHERE ItemVersion_Id = " & verId
    
-   rst.Open sql, dbconn, adOpenDynamic, adLockPessimistic
+   rst.Open sql, dbConn, adOpenDynamic, adLockPessimistic
    
    While Not rst.EOF
       rst.Delete
@@ -161,7 +168,7 @@ Public Sub deleteStatuses(verId As Long)
    
    sql = "SELECT * FROM " & VERSION_STATUS & " WHERE ItemVersion_Id = " & verId
    
-   rst.Open sql, dbconn, adOpenDynamic, adLockPessimistic
+   rst.Open sql, dbConn, adOpenDynamic, adLockPessimistic
    
    While Not rst.EOF
       rst.Delete
@@ -180,7 +187,7 @@ Public Sub deleteDecisions(verId As Long)
    
    sql = "SELECT * FROM " & VERSION_DECISION & " WHERE ItemVersion_Id = " & verId
    
-   rst.Open sql, dbconn, adOpenDynamic, adLockPessimistic
+   rst.Open sql, dbConn, adOpenDynamic, adLockPessimistic
    
    While Not rst.EOF
       rst.Delete
@@ -199,7 +206,7 @@ Public Sub deleteVersion(verId As Long)
    
    sql = "SELECT * FROM " & ITEM_VERSION & " WHERE Id = " & verId
    
-   rst.Open sql, dbconn, adOpenDynamic, adLockPessimistic
+   rst.Open sql, dbConn, adOpenDynamic, adLockPessimistic
    
    While Not rst.EOF
       rst.Delete
@@ -218,7 +225,7 @@ Public Sub deleteProperties(entityCode As String)
    
    sql = "SELECT * FROM " & ITEM_PROPERTY_VALUE & " WHERE Item_Code = '" & entityCode & "'"
    
-   rst.Open sql, dbconn, adOpenDynamic, adLockPessimistic
+   rst.Open sql, dbConn, adOpenDynamic, adLockPessimistic
    
    While Not rst.EOF
       rst.Delete
@@ -237,7 +244,7 @@ Public Sub deleteEntity(entityCode As String)
    
    sql = "SELECT * FROM " & CORE_ITEM & " WHERE Code = '" & entityCode & "'"
    
-   rst.Open sql, dbconn, adOpenDynamic, adLockPessimistic
+   rst.Open sql, dbConn, adOpenDynamic, adLockPessimistic
    
    While Not rst.EOF
       rst.Delete
@@ -250,6 +257,6 @@ Public Sub deleteEntity(entityCode As String)
 End Sub
 Private Sub Class_Terminate()
 
-   Set dbconn = Nothing
+   Set dbConn = Nothing
    
 End Sub

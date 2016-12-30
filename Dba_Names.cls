@@ -10,14 +10,21 @@ Attribute VB_Exposed = False
 Option Compare Database
 Option Explicit
 
-Private dbconn As ADODB.Connection
+Private dbConn As ADODB.Connection
 
 
 Private Sub Class_Initialize()
-
-   Set dbconn = CurrentProject.Connection
+'TODO: Replace this with init
+   Set dbConn = CurrentProject.Connection
    
 End Sub
+
+
+Public Sub init(conn As ADODB.Connection)
+   Set dbConn = conn
+   
+End Sub
+
 
 Public Function getName(entityCode As String, language As String) As ADODB.Recordset
 ' Return the name of a specific entity with requested language as a name object.
@@ -35,7 +42,7 @@ Public Function getName(entityCode As String, language As String) As ADODB.Recor
    sql = "SELECT * FROM " & ITEM_NAME & _
          " WHERE Item_Code = '" & entityCode & "' AND Lang_Code = '" & language & "'"
    
-   rst.Open sql, dbconn, adOpenDynamic, adLockPessimistic
+   rst.Open sql, dbConn, adOpenDynamic, adLockPessimistic
    
    Set getName = rst
    Set rst = Nothing
@@ -51,7 +58,7 @@ Public Function isNameUnique(newName As EntityName, entityType As String) As Boo
    sql = "SELECT n.Text FROM " & ITEM_NAME & " AS n INNER JOIN " & CORE_ITEM & " AS i ON i.Code = n.Item_Code " & _
          " WHERE i.Type = '" & entityType & "'AND n.Text = '" & newName.getText & "' AND Lang_Code = '" & newName.getLanguage & "'"
          
-   rst.Open sql, dbconn, adOpenDynamic, adLockPessimistic
+   rst.Open sql, dbConn, adOpenDynamic, adLockPessimistic
    
    If rst.EOF Then
       isNameUnique = True
@@ -69,7 +76,7 @@ Public Sub insertName(entityCode As String, newName As EntityName)
 
    Dim rst  As New ADODB.Recordset
    
-   rst.Open ITEM_NAME, dbconn, adOpenDynamic, adLockPessimistic
+   rst.Open ITEM_NAME, dbConn, adOpenDynamic, adLockPessimistic
    
    rst.AddNew
    rst!text = newName.text
@@ -91,7 +98,7 @@ Public Sub updateName(entityCode As String, currentName As EntityName)
    sql = "SELECT * FROM " & ITEM_NAME & _
          " WHERE Item_Code = '" & entityCode & "' AND Lang_Code='" & currentName.lang & "'"
          
-   rst.Open sql, dbconn, adOpenDynamic, adLockPessimistic
+   rst.Open sql, dbConn, adOpenDynamic, adLockPessimistic
    
    rst!text = currentName.text
    rst.Update
@@ -103,7 +110,7 @@ End Sub
 
 Private Sub Class_Terminate()
 
-   Set dbconn = Nothing
+   Set dbConn = Nothing
 
 End Sub
 

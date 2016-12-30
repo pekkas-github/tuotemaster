@@ -121,9 +121,9 @@ Public Function getNewDecision() As Decision
         
 End Function
 
-Public Function getPriceLine(priceLineCode As String) As priceLine
+Public Function getPriceLine(priceLineCode As String) As PriceLine
 
-   Dim repo As rep_PriceLines
+   Dim repo As repo_PriceLines
    
    Set repo = new_PriceLines(oCode, oVersionNro)
    
@@ -137,13 +137,13 @@ Public Function getPriceLine(priceLineCode As String) As priceLine
    
 End Function
 
-Public Sub setPriceLine(priceLine As priceLine)
+Public Sub setPriceLine(PriceLine As PriceLine)
    
-   Dim repo As rep_PriceLines
+   Dim repo As repo_PriceLines
    
    Set repo = new_PriceLines(oCode, oVersionNro)
 
-   Call repo.savePriceLine(priceLine)
+   Call repo.savePriceLine(PriceLine)
    
    Set repo = Nothing
    

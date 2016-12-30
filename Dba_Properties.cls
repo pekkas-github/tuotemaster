@@ -10,12 +10,19 @@ Attribute VB_Exposed = False
 Option Compare Database
 Option Explicit
 
-Private dbconn As ADODB.Connection
+Private dbConn As ADODB.Connection
 
 Private Sub Class_Initialize()
+'TODO: Replace with init
 
-   Set dbconn = CurrentProject.Connection
+   Set dbConn = CurrentProject.Connection
    
+End Sub
+
+
+Public Sub init(conn As ADODB.Connection)
+   Set dbConn = conn
+
 End Sub
 
 Public Function getProperty(entityCode As String, propertyType As String) As ADODB.Recordset
@@ -28,7 +35,7 @@ Public Function getProperty(entityCode As String, propertyType As String) As ADO
          " WHERE Item_Code = '" & entityCode & "' " & _
          "AND Property_Id = '" & propertyType & "'"
    
-   rst.Open sql, dbconn, adOpenDynamic, adLockPessimistic
+   rst.Open sql, dbConn, adOpenDynamic, adLockPessimistic
    
    Set getProperty = rst
    Set rst = Nothing
@@ -40,7 +47,7 @@ Public Sub insertProperty(entityCode As String, propertyType As String, property
 
    Dim rst  As New ADODB.Recordset
    
-   rst.Open ITEM_PROPERTY_VALUE, dbconn, adOpenDynamic, adLockPessimistic
+   rst.Open ITEM_PROPERTY_VALUE, dbConn, adOpenDynamic, adLockPessimistic
    
    With rst
       .AddNew
@@ -60,7 +67,7 @@ Public Sub updateProperty(entityCode As String, propertyType As String, property
    
    sql = "SELECT * FROM " & ITEM_PROPERTY_VALUE & " WHERE Item_Code = '" & entityCode & "' AND Property_Id = '" & propertyType & "'"
    
-   rst.Open sql, dbconn, adOpenDynamic, adLockPessimistic
+   rst.Open sql, dbConn, adOpenDynamic, adLockPessimistic
    
    rst!value_Id = propertyValue
    rst.Update
@@ -78,7 +85,7 @@ Public Function getPropertyTypeName(propertyType As String, language As String) 
          "FROM " & PROPERTY_TYPE & _
          " WHERE Id = '" & propertyType & "' AND [Language] = '" & language & "'"
          
-   rst.Open sql, dbconn, adOpenForwardOnly, adLockPessimistic
+   rst.Open sql, dbConn, adOpenForwardOnly, adLockPessimistic
    
    getPropertyTypeName = rst!LookupText
    
@@ -95,7 +102,7 @@ Public Function getPropertyValueName(propertyValue As String, language As String
    sql = "SELECT LookupText FROM " & PROPERTY_VALUE & _
          " WHERE Value_Id = '" & propertyValue & "' AND [Language] = '" & language & "'"
          
-   rst.Open sql, dbconn, adOpenDynamic, adLockPessimistic
+   rst.Open sql, dbConn, adOpenDynamic, adLockPessimistic
    
    If rst.EOF Then
       getPropertyValueName = ""

@@ -1,4 +1,4 @@
-Attribute VB_Name = "Injector"
+Attribute VB_Name = "New_Object"
 Option Compare Database
 Option Explicit
 ' This module has functions that simplifies initialization of new objects
@@ -10,6 +10,102 @@ Option Explicit
 ' Each target class has a public "init" method that is called from these
 ' functions and which acts as a constructor in the class.
 '
+
+Public Function new_Abs_Names(entityCode As String, entityType As String) As Abs_Names
+
+   Dim newAbsNames   As New Abs_Names
+   
+   Call newAbsNames.init(entityCode, entityType)
+   Set new_Abs_Names = newAbsNames
+   
+   Set newAbsNames = Nothing
+   
+End Function
+
+Public Function new_Dba_Documents() As Dba_Documents
+
+   Dim newDbaDocuments As New Dba_Documents
+   
+   Call newDbaDocuments.init(CurrentProject.Connection)
+   Set new_Dba_Documents = newDbaDocuments
+   
+   Set newDbaDocuments = Nothing
+   
+End Function
+
+
+Public Function new_Dba_GroupMapper() As Dba_GroupMapper
+
+   Dim newDbaGroupMapper As New Dba_GroupMapper
+   
+   Call newDbaGroupMapper.init(CurrentProject.Connection)
+   Set new_Dba_GroupMapper = newDbaGroupMapper
+   
+   Set newDbaGroupMapper = Nothing
+   
+End Function
+
+
+Public Function new_Dba_Names() As Dba_Names
+
+   Dim newDbaNames As New Dba_Names
+   
+   Call newDbaNames.init(CurrentProject.Connection)
+   Set new_Dba_Names = newDbaNames
+   
+   Set newDbaNames = Nothing
+   
+End Function
+
+
+Public Function new_Dba_Owners() As Dba_Owners
+
+   Dim newDbaOwners As New Dba_Owners
+   
+   Call newDbaOwners.init(CurrentProject.Connection)
+   Set new_Dba_Owners = newDbaOwners
+   
+   Set newDbaOwners = Nothing
+   
+End Function
+
+
+Public Function new_Dba_PriceLines() As Dba_PriceLines
+
+   Dim newDbaPriceLines As New Dba_PriceLines
+   
+   Call newDbaPriceLines.init(CurrentProject.Connection)
+   Set new_Dba_PriceLines = newDbaPriceLines
+   
+   Set newDbaPriceLines = Nothing
+   
+End Function
+
+
+Public Function new_Dba_Properties() As Dba_Properties
+
+   Dim newDbaProperties As New Dba_Properties
+   
+   Call newDbaProperties.init(CurrentProject.Connection)
+   Set new_Dba_Properties = newDbaProperties
+   
+   Set newDbaProperties = Nothing
+   
+End Function
+
+
+Public Function new_Dba_Services() As Dba_Services
+
+   Dim newDbaServices As New Dba_Services
+   
+   Call newDbaServices.init(CurrentProject.Connection)
+   Set new_Dba_Services = newDbaServices
+   
+   Set newDbaServices = Nothing
+   
+End Function
+
+
 Public Function new_Decision(isNew As Boolean) As Decision
 
    Dim newDecision   As New Decision
@@ -56,6 +152,29 @@ Public Function new_Descriptions() As Descriptions
    
 End Function
 
+
+Public Function new_Document() As Document
+
+   Dim newDocument  As New Document
+   
+   Call newDocument.init
+   Set new_Document = newDocument
+   
+   Set newDocument = Nothing
+   
+End Function
+
+
+Public Function new_Documents(entityCode As String, versionNro As String) As Documents
+
+   Dim newDocuments  As New Documents
+   
+   Call newDocuments.init(entityCode, versionNro)
+   Set new_Documents = newDocuments
+   
+   Set newDocuments = Nothing
+   
+End Function
 
 Public Function new_Entity(entityCode As String, entityType As String, versionNro As String) As Entity
 ' Construct a new entity with proper behaviors
@@ -127,10 +246,19 @@ Public Function new_Owner(personId As Long, startDate As Date) As Owner
    
 End Function
 
+Public Function new_PriceLine() As PriceLine
 
-Public Function new_PriceLines(salesItemCode As String, versionNumber As String) As rep_PriceLines
+   Dim newPriceLine  As New PriceLine
+   
+   Call newPriceLine.init
+   Set new_PriceLine = newPriceLine
+   
+   Set newPriceLine = Nothing
+   
+End Function
+Public Function new_PriceLines(salesItemCode As String, versionNumber As String) As repo_PriceLines
 
-   Dim newRepo    As New rep_PriceLines
+   Dim newRepo    As New repo_PriceLines
    
    Call newRepo.init(salesItemCode, versionNumber)
    
@@ -140,9 +268,20 @@ Public Function new_PriceLines(salesItemCode As String, versionNumber As String)
 
 End Function
 
-Public Function new_PriceListEntry(priceLineId As String, priceListId As String, Optional id As Long) As priceListEntry
 
-   Dim newPriceListEntry   As priceListEntry
+Public Function new_PriceListEntries(priceLineCode As String) As repo_PriceListEntries
+
+   Dim newRepo As New repo_PriceListEntries
+   
+   Call newRepo.init(priceLineCode)
+   Set new_PriceListEntries = newRepo
+   
+   Set newRepo = Nothing
+
+End Function
+Public Function new_PriceListEntry(priceLineId As String, priceListId As String, Optional id As Long) As PriceListEntry
+
+   Dim newPriceListEntry   As New PriceListEntry
    
    Call newPriceListEntry.init(priceLineId, priceListId)
    Set new_PriceListEntry = newPriceListEntry
@@ -174,16 +313,6 @@ Public Function new_Properties(entityCode As String, entityType As String)
 End Function
 
 
-Public Function new_Documents(entityCode As String, versionNro As String) As Documents
-
-   Dim newDocuments  As New Documents
-   
-   Call newDocuments.init(entityCode, versionNro)
-   Set new_Documents = newDocuments
-   
-   Set newDocuments = Nothing
-   
-End Function
 
 Public Function new_Status(statusType As Integer, startDate As Date) As Status
 '
