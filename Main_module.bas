@@ -9,7 +9,7 @@ Public Function Main() As Boolean
 
    On Error GoTo catch
    
-   Globals.lang = "fin"            ' Default data representation language
+   Globals.lang = "fin"             ' Default data representation language
    
    If Globals.IS_LIVE Then
       StartApplication
