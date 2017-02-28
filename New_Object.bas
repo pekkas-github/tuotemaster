@@ -11,11 +11,48 @@ Option Explicit
 ' functions and which acts as a constructor in the class.
 '
 
-Public Function new_Abs_Names(entityCode As String, entityType As String) As Abs_Names
+Public Function new_Application_API() As Application_API
+' Singleton
+
+   Static app  As Application_API
+   
+   If app Is Nothing Then
+      Set app = New Application_API
+   End If
+   
+   Set new_Application_API = app
+   
+End Function
+
+Public Function new_abs_Entities() As abs_Entities
+' Singleton
+   
+   Static statAbsEntities  As abs_Entities
+   
+   If statAbsEntities Is Nothing Then
+      Set statAbsEntities = New abs_Entities
+   End If
+   
+   Set new_abs_Entities = statAbsEntities
+   
+End Function
+
+Public Function new_abs_Entity(entityCode As String, versionNro As String) As abs_Entity
+
+   Dim newEntity  As New abs_Entity
+   
+   Call newEntity.init(entityCode, versionNro)
+   
+   Set new_abs_Entity = newEntity
+   Set newEntity = Nothing
+   
+End Function
+
+Public Function new_Abs_Names(entityCode As String) As Abs_Names
 
    Dim newAbsNames   As New Abs_Names
    
-   Call newAbsNames.init(entityCode, entityType)
+   Call newAbsNames.init(entityCode)
    Set new_Abs_Names = newAbsNames
    
    Set newAbsNames = Nothing
@@ -24,91 +61,133 @@ End Function
 
 Public Function new_Dba_Documents() As Dba_Documents
 
-   Dim newDbaDocuments As New Dba_Documents
+   Set new_Dba_Documents = New Dba_Documents
+      
+End Function
+
+
+Public Function new_Dba_BillingMapper() As Dba_BillingMapper
    
-   Call newDbaDocuments.init(CurrentProject.Connection)
-   Set new_Dba_Documents = newDbaDocuments
-   
-   Set newDbaDocuments = Nothing
-   
+   Set new_Dba_BillingMapper = New Dba_BillingMapper
+      
 End Function
 
 
 Public Function new_Dba_GroupMapper() As Dba_GroupMapper
 
-   Dim newDbaGroupMapper As New Dba_GroupMapper
-   
-   Call newDbaGroupMapper.init(CurrentProject.Connection)
-   Set new_Dba_GroupMapper = newDbaGroupMapper
-   
-   Set newDbaGroupMapper = Nothing
-   
+   Set new_Dba_GroupMapper = New Dba_GroupMapper
+      
 End Function
 
 
 Public Function new_Dba_Names() As Dba_Names
 
-   Dim newDbaNames As New Dba_Names
-   
-   Call newDbaNames.init(CurrentProject.Connection)
-   Set new_Dba_Names = newDbaNames
-   
-   Set newDbaNames = Nothing
+   Set new_Dba_Names = New Dba_Names
    
 End Function
 
 
 Public Function new_Dba_Owners() As Dba_Owners
 
-   Dim newDbaOwners As New Dba_Owners
-   
-   Call newDbaOwners.init(CurrentProject.Connection)
-   Set new_Dba_Owners = newDbaOwners
-   
-   Set newDbaOwners = Nothing
-   
+   Set new_Dba_Owners = New Dba_Owners
+      
 End Function
 
 
 Public Function new_Dba_PriceLines() As Dba_PriceLines
 
-   Dim newDbaPriceLines As New Dba_PriceLines
-   
-   Call newDbaPriceLines.init(CurrentProject.Connection)
-   Set new_Dba_PriceLines = newDbaPriceLines
-   
-   Set newDbaPriceLines = Nothing
-   
+   Set new_Dba_PriceLines = New Dba_PriceLines
+      
 End Function
 
 
 Public Function new_Dba_Properties() As Dba_Properties
 
-   Dim newDbaProperties As New Dba_Properties
-   
-   Call newDbaProperties.init(CurrentProject.Connection)
-   Set new_Dba_Properties = newDbaProperties
-   
-   Set newDbaProperties = Nothing
+   Set new_Dba_Properties = New Dba_Properties
    
 End Function
 
 
 Public Function new_Dba_Services() As Dba_Services
 
-   Dim newDbaServices As New Dba_Services
-   
-   Call newDbaServices.init(CurrentProject.Connection)
-   Set new_Dba_Services = newDbaServices
-   
-   Set newDbaServices = Nothing
+   Set new_Dba_Services = New Dba_Services
    
 End Function
 
 
-Public Function new_Decision(isNew As Boolean) As Decision
+Public Function new_Category(categoryCode As String, namesBeh As If_Names, ownersBeh As If_Owners) As dom_Category
 
-   Dim newDecision   As New Decision
+   Dim newCategory   As New dom_Category
+   
+   newCategory.init categoryCode, namesBeh, ownersBeh
+   
+   Set new_Category = newCategory
+   Set newCategory = Nothing
+   
+End Function
+Public Function new_Categories() As repo_Categories
+'Singleton
+
+   Static repo As repo_Categories
+   
+   If repo Is Nothing Then
+      Set repo = New repo_Categories
+   End If
+   
+   Set new_Categories = repo
+   
+End Function
+Public Function new_PriceLines(salesItemCode As String, salesItemVersion As String) As repo_PriceLines
+' Create and return a new Priceline repository associated to the parent Sales Item.
+
+   Dim repo As New repo_PriceLines
+   
+   repo.init salesItemCode, salesItemVersion
+   
+   Set new_PriceLines = repo
+   Set repo = Nothing
+   
+End Function
+
+
+Public Function new_PriceListEntry(priceLineCode As String, priceListID As String) As dom_PriceListEntry
+
+   Dim newPrice   As New dom_PriceListEntry
+   
+   Call newPrice.init(priceLineCode, priceListID)
+   
+   Set new_PriceListEntry = newPrice
+   Set newPrice = Nothing
+   
+End Function
+
+Public Function new_PriceListEntries(priceLineCode As String) As repo_PriceListEntries
+' Create and return a new Pricelist Entry repository associated to the parent Price Line.
+
+   Dim repo As New repo_PriceListEntries
+   
+   repo.init priceLineCode
+   
+   Set new_PriceListEntries = repo
+   Set repo = Nothing
+   
+End Function
+
+Public Function new_SalesItems(productCode As String) As repo_SalesItems
+' Create and return a new Sales Item repository associated to the parent product
+
+   Dim repo As repo_SalesItems
+   
+   Set repo = New repo_SalesItems
+   repo.init productCode
+   
+   Set new_SalesItems = repo
+   Set repo = Nothing
+   
+End Function
+Public Function new_Decision(isNew As Boolean) As dom_Decision
+
+   Dim newDecision   As New dom_Decision
    
    Call newDecision.init(isNew)
    Set new_Decision = newDecision
@@ -117,9 +196,9 @@ Public Function new_Decision(isNew As Boolean) As Decision
    
 End Function
 
-Public Function new_Decisions() As Decisions
+Public Function new_Decisions() As repo_Decisions
    
-   Dim newDecisions  As New Decisions
+   Dim newDecisions  As New repo_Decisions
    
    Call newDecisions.init
    Set new_Decisions = newDecisions
@@ -129,9 +208,9 @@ Public Function new_Decisions() As Decisions
 End Function
 
 
-Public Function new_Description(entityCode As String, versionNro As String, language As String)
+Public Function new_Description(entityCode As String, versionNro As String, language As String) As dom_Description
 
-   Dim newDescription As New description
+   Dim newDescription As New dom_Description
    
    Call newDescription.init(entityCode, versionNro, language)
    Set new_Description = newDescription
@@ -141,9 +220,9 @@ Public Function new_Description(entityCode As String, versionNro As String, lang
 End Function
 
 
-Public Function new_Descriptions() As Descriptions
+Public Function new_Descriptions() As repo_Descriptions
 
-   Dim newDescriptions  As New Descriptions
+   Dim newDescriptions  As New repo_Descriptions
    
    Call newDescriptions.init
    Set new_Descriptions = newDescriptions
@@ -153,11 +232,11 @@ Public Function new_Descriptions() As Descriptions
 End Function
 
 
-Public Function new_Document() As Document
+Public Function new_Document() As dom_Document
 
-   Dim newDocument  As New Document
+   Dim newDocument  As New dom_Document
    
-   Call newDocument.init
+   newDocument.init
    Set new_Document = newDocument
    
    Set newDocument = Nothing
@@ -165,9 +244,9 @@ Public Function new_Document() As Document
 End Function
 
 
-Public Function new_Documents(entityCode As String, versionNro As String) As Documents
+Public Function new_Documents(entityCode As String, versionNro As String) As repo_Documents
 
-   Dim newDocuments  As New Documents
+   Dim newDocuments  As New repo_Documents
    
    Call newDocuments.init(entityCode, versionNro)
    Set new_Documents = newDocuments
@@ -176,56 +255,10 @@ Public Function new_Documents(entityCode As String, versionNro As String) As Doc
    
 End Function
 
-Public Function new_Entity(entityCode As String, entityType As String, versionNro As String) As Entity
-' Construct a new entity with proper behaviors
 
-   Dim newEntity     As New Entity
-   Dim nameBehavior  As Object
-   Dim ownerBehavior As Object
+Public Function new_Name(nameText As String, language As String) As dom_Name
    
-   Select Case entityType
-      Case "MN"
-         Set nameBehavior = New Names_Any
-         Call nameBehavior.init(entityCode, entityType)
-         Set ownerBehavior = New Owners_Parent
-         Call ownerBehavior.init
-      
-      Case "GRP"
-         Set nameBehavior = New Names_Any
-         Call nameBehavior.init(entityCode, entityType)
-         Set ownerBehavior = New Owners_Self
-         Call ownerBehavior.init
-      
-      Case Else
-         Set nameBehavior = New Names_Unique
-         Call nameBehavior.init(entityCode, entityType)
-         Set ownerBehavior = New Owners_Self
-         Call ownerBehavior.init
-   End Select
-      
-   Call newEntity.init(entityCode, entityType, versionNro, nameBehavior, ownerBehavior)
-   Set new_Entity = newEntity
-   
-   Set newEntity = Nothing
-   
-End Function
-
-
-Public Function new_Entities() As Entities
-
-   Dim newEntities As New Entities
-   
-   Call newEntities.init
-   Set new_Entities = newEntities
-   
-   Set newEntities = Nothing
-   
-End Function
-
-
-Public Function new_Name(nameText As String, language As String)
-   
-   Dim newName As New EntityName
+   Dim newName As New dom_Name
    
    Call newName.init(nameText, language)
    Set new_Name = newName
@@ -234,10 +267,30 @@ Public Function new_Name(nameText As String, language As String)
    
 End Function
 
+Public Function new_Names_Any(entityCode As String) As repo_Names_Any
 
-Public Function new_Owner(personId As Long, startDate As Date) As Owner
+   Dim newNames   As New repo_Names_Any
+   
+   newNames.init entityCode
+   
+   Set new_Names_Any = newNames
+   Set newNames = Nothing
+   
+End Function
 
-   Dim newOwner As New Owner
+Public Function new_Names_Unique(entityCode As String) As repo_Names_Unique
+
+   Dim newNames   As New repo_Names_Unique
+   
+   newNames.init entityCode
+   
+   Set new_Names_Unique = newNames
+   Set newNames = Nothing
+   
+End Function
+Public Function new_Owner(personId As Long, startDate As Date) As dom_Owner
+
+   Dim newOwner As New dom_Owner
    
    Call newOwner.init(personId, startDate)
    Set new_Owner = newOwner
@@ -246,9 +299,36 @@ Public Function new_Owner(personId As Long, startDate As Date) As Owner
    
 End Function
 
-Public Function new_PriceLine() As PriceLine
 
-   Dim newPriceLine  As New PriceLine
+Public Function new_Owners_Self() As repo_Owners_Self
+' Sinleton
+
+   Static statOwners  As repo_Owners_Self
+   
+   If statOwners Is Nothing Then
+      Set statOwners = New repo_Owners_Self
+   End If
+   
+   Set new_Owners_Self = statOwners
+
+End Function
+
+Public Function new_Owners_Parent() As repo_Owners_Parent
+' Singleton
+
+   Static statOwners  As repo_Owners_Parent
+   
+   If statOwners Is Nothing Then
+      Set statOwners = New repo_Owners_Parent
+   End If
+   
+   Set new_Owners_Parent = statOwners
+
+End Function
+
+Public Function new_PriceLine() As dom_PriceLine
+
+   Dim newPriceLine  As New dom_PriceLine
    
    Call newPriceLine.init
    Set new_PriceLine = newPriceLine
@@ -256,43 +336,20 @@ Public Function new_PriceLine() As PriceLine
    Set newPriceLine = Nothing
    
 End Function
-Public Function new_PriceLines(salesItemCode As String, versionNumber As String) As repo_PriceLines
 
-   Dim newRepo    As New repo_PriceLines
-   
-   Call newRepo.init(salesItemCode, versionNumber)
-   
-   Set new_PriceLines = newRepo
-   
-   Set newRepo = Nothing
+Public Function new_SalesItem(itemCode As String, itemVersion As String, namesBeh As If_Names, ownersBeh As If_Owners) As dom_SalesItem
 
-End Function
-
-
-Public Function new_PriceListEntries(priceLineCode As String) As repo_PriceListEntries
-
-   Dim newRepo As New repo_PriceListEntries
+   Dim salesItem  As New dom_SalesItem
    
-   Call newRepo.init(priceLineCode)
-   Set new_PriceListEntries = newRepo
+   salesItem.init itemCode, itemVersion, namesBeh, ownersBeh
    
-   Set newRepo = Nothing
-
-End Function
-Public Function new_PriceListEntry(priceLineId As String, priceListId As String, Optional id As Long) As PriceListEntry
-
-   Dim newPriceListEntry   As New PriceListEntry
-   
-   Call newPriceListEntry.init(priceLineId, priceListId)
-   Set new_PriceListEntry = newPriceListEntry
-   
-   Set newPriceListEntry = Nothing
+   Set new_SalesItem = salesItem
+   Set salesItem = Nothing
    
 End Function
+Public Function new_Property(entityType As String, propertyType As String, valueId As String, isNew As Boolean) As dom_Property
 
-Public Function new_Property(entityType As String, propertyType As String, valueId As String, isNew As Boolean) As Property
-
-   Dim newProperty   As New Property
+   Dim newProperty   As New dom_Property
    
    Call newProperty.init(entityType, propertyType, valueId, isNew)
    Set new_Property = newProperty
@@ -301,39 +358,77 @@ Public Function new_Property(entityType As String, propertyType As String, value
    
 End Function
 
-Public Function new_Properties(entityCode As String, entityType As String)
+Public Function new_Properties(entityCode As String, entityType As String) As repo_Properties
 
-   Dim newProperties As New Properties
+   Dim newProperties As New repo_Properties
    
    Call newProperties.init(entityCode, entityType)
-   Set new_Properties = newProperties
    
+   Set new_Properties = newProperties
    Set newProperties = Nothing
    
 End Function
 
+Public Function new_Product(productCode As String, versionNro As String, namesBeh As If_Names, ownersBeh As If_Owners) As dom_Product
 
-
-Public Function new_Status(statusType As Integer, startDate As Date) As Status
-'
-
-   Dim newStatus As New Status
+   Dim newProduct As New dom_Product
    
-      Call newStatus.init(statusType, startDate)
+   newProduct.init productCode, versionNro, namesBeh, ownersBeh
    
-   Set new_Status = newStatus
-   
-   Set newStatus = Nothing
+   Set new_Product = newProduct
+   Set newProduct = Nothing
    
 End Function
 
-Public Function new_Statuses() As Statuses
+
+Public Function new_Products() As repo_Products
+' Singleton
    
-   Dim newStatuses As New Statuses
+   Static statProducts  As repo_Products
    
-   Call newStatuses.init
-   Set new_Statuses = newStatuses
+   If statProducts Is Nothing Then
+      Set statProducts = New repo_Products
+   End If
    
-   Set newStatuses = Nothing
+   Set new_Products = statProducts
+   
+End Function
+
+Public Function new_Status(statusType As Integer, startDate As Date) As dom_Status
+'
+
+   Dim NewStatus As New dom_Status
+   
+      Call NewStatus.init(statusType, startDate)
+   
+   Set new_Status = NewStatus
+   
+   Set NewStatus = Nothing
+   
+End Function
+
+Public Function new_Statuses() As repo_Statuses
+' Singleton
+
+   Static statStatuses  As repo_Statuses
+   
+   If statStatuses Is Nothing Then
+      Set statStatuses = New repo_Statuses
+   End If
+   
+   Set new_Statuses = statStatuses
+
+End Function
+
+Public Function new_Services() As Services
+' Singleton object
+   
+   Static singletonServices   As Services
+   
+   If singletonServices Is Nothing Then
+      Set singletonServices = New Services
+   End If
+   
+   Set new_Services = singletonServices
    
 End Function

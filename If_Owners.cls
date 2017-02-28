@@ -10,10 +10,14 @@ Attribute VB_Exposed = True
 Option Compare Database
 Option Explicit
 
-Public Function getOwner(entityCode As String) As Owner
+Public Sub init()
+
+End Sub
+
+Public Function getOwner(entityCode As String) As dom_Owner
 
 End Function
 
-Public Sub saveOwner(entityCode As String, newOwner As Owner)
+Public Sub saveOwner(entityCode As String, newOwner As dom_Owner)
 
 End Sub

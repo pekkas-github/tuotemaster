@@ -2,7 +2,7 @@ VERSION 1.0 CLASS
 BEGIN
   MultiUse = -1  'True
 END
-Attribute VB_Name = "Properties"
+Attribute VB_Name = "repo_Properties"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
@@ -22,7 +22,7 @@ Private oEntityType  As String
 'constructor
 Public Sub init(entityCode As String, entityType As String)
    
-   Set app = New Application_API
+   Set app = new_Application_API
    Set db = New Dba_Properties
    oEntityCode = entityCode
    oEntityType = entityType
@@ -30,7 +30,7 @@ Public Sub init(entityCode As String, entityType As String)
 End Sub
 
 
-Public Function getProperty(propertyType As String) As Property
+Public Function getProperty(propertyType As String) As dom_Property
 '  Get property record from database. If no records were returned then return a new
 '  property object.
 
@@ -49,7 +49,7 @@ Public Function getProperty(propertyType As String) As Property
 End Function
 
 
-Public Sub saveProperty(prop As Property)
+Public Sub saveProperty(prop As dom_Property)
 '  Insert or update the property (value) into database.
 
    If prop.isNew Then

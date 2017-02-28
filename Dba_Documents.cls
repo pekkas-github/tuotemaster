@@ -10,17 +10,12 @@ Attribute VB_Exposed = False
 Option Compare Database
 Option Explicit
 
-Private dbConn    As ADODB.Connection
+Private app       As Application_API
 
 Private Sub Class_Initialize()
-'TODO: Replace this with init in all places where is new Dba_Documents
-   Set dbConn = CurrentProject.Connection
-End Sub
 
-Public Sub init(conn As ADODB.Connection)
-
-   Set dbConn = conn
-        
+   Set app = new_Application_API
+   
 End Sub
 
 
@@ -35,7 +30,7 @@ Public Function getDocument(docId As Long) As ADODB.Recordset
           "INNER JOIN " & DOC_TYPE & " AS typ ON ref.DocumentType_Id = typ.Id " & _
           "WHERE ref.Id = " & docId
     
-    rst.Open sql, dbConn, adOpenDynamic, adLockPessimistic
+    rst.Open sql, app.getDbConn, adOpenDynamic, adLockPessimistic
     Set getDocument = rst
     Set rst = Nothing
 
@@ -43,12 +38,12 @@ Public Function getDocument(docId As Long) As ADODB.Recordset
 End Function
 
 
-Public Function insertDocReference(entityVersion As Long, docRef As Document) As Long
+Public Function insertDocReference(entityVersion As Long, docRef As dom_Document) As Long
 
 
    Dim rst As New ADODB.Recordset
    
-   rst.Open DOC_REFERENCE, dbConn, adOpenDynamic, adLockPessimistic
+   rst.Open DOC_REFERENCE, app.getDbConn, adOpenDynamic, adLockPessimistic
    
    rst.AddNew
    rst!ItemVersion_Id = entityVersion
@@ -65,13 +60,13 @@ Public Function insertDocReference(entityVersion As Long, docRef As Document) As
 End Function
 
 
-Public Sub updateDocReference(docRef As Document)
+Public Sub updateDocReference(docRef As dom_Document)
 
    Dim rst As New ADODB.Recordset
    Dim sql As String
    
    sql = "SELECT * FROM " & DOC_REFERENCE & " WHERE Id = " & docRef.getId
-   rst.Open sql, dbConn, adOpenDynamic, adLockPessimistic
+   rst.Open sql, app.getDbConn, adOpenDynamic, adLockPessimistic
    
    With rst
       !DocumentType_id = docRef.getType
@@ -93,7 +88,7 @@ Public Sub deleteDocReference(docId As Long)
    
    sql = "SELECT * FROM " & DOC_REFERENCE & " WHERE Id = " & docId
    
-   rst.Open sql, dbConn, adOpenDynamic, adLockPessimistic
+   rst.Open sql, app.getDbConn, adOpenDynamic, adLockPessimistic
    
    With rst
       .Delete
@@ -105,3 +100,9 @@ Public Sub deleteDocReference(docId As Long)
    
 End Sub
 
+
+Private Sub Class_Terminate()
+   
+   Set app = Nothing
+
+End Sub

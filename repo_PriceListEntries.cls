@@ -17,22 +17,22 @@ Private oPriceLineCode  As String
 
 Public Sub init(priceLineCode As String)
    oPriceLineCode = priceLineCode
-   Set dba = New Dba_PriceLines
+   Set dba = new_Dba_PriceLines
    
 End Sub
 
 
 Private Sub Class_Terminate()
 
-        Set dba = Nothing
+   Set dba = Nothing
         
 End Sub
 
 '---- METHODS ---------------------
 
 
-Public Function getPriceListEntry(priceListEntryId As Long) As PriceListEntry
-' Return the priceListEntry object from the database.
+Public Function getPriceListEntry(priceListEntryId As Long) As dom_PriceListEntry
+' Return a selected priceListEntry object from database.
         
    Dim rst  As ADODB.Recordset
    Set rst = dba.getPriceListEntry(priceListEntryId)
@@ -44,7 +44,7 @@ End Function
 
 
 
-Public Function createPriceListEntry(priceLineId As String) As PriceListEntry
+Public Function createPriceListEntry(priceLineId As String) As dom_PriceListEntry
 ' Rerurn
 '  - a new PriceListEntry object if there is no or no future price list entry
 '  - the future PriceListEntry object for updates if there is one (you cannot
@@ -67,9 +67,10 @@ Public Function createPriceListEntry(priceLineId As String) As PriceListEntry
 End Function
 
 
-Private Function returnPriceListEntry(rst As ADODB.Recordset) As PriceListEntry
-'
-   Dim newPriceListEntry   As PriceListEntry
+Private Function returnPriceListEntry(rst As ADODB.Recordset) As dom_PriceListEntry
+' Construct a Pricelist Entry object from recordset
+
+   Dim newPriceListEntry   As dom_PriceListEntry
    Set newPriceListEntry = new_PriceListEntry(rst!PriceLine_Id, "STD")
       
    With newPriceListEntry
@@ -82,7 +83,7 @@ Private Function returnPriceListEntry(rst As ADODB.Recordset) As PriceListEntry
       .setVMA (rst!vma)
       .setVMABoost (rst!VMA_boost)
       .setActivity (rst!active)
-      .setComment Nz((rst!comment))
+      .setComment Nz((rst!Comment))
       .isNew = False
       .isModified = False
    End With
@@ -93,10 +94,10 @@ Private Function returnPriceListEntry(rst As ADODB.Recordset) As PriceListEntry
 End Function
 
 
-Private Function createNewPriceListEntry(priceLineId As String) As PriceListEntry
+Private Function createNewPriceListEntry(priceLineId As String) As dom_PriceListEntry
 ' Build a new PriceListEntry object
 
-   Dim newPriceListEntry   As PriceListEntry
+   Dim newPriceListEntry   As dom_PriceListEntry
    Set newPriceListEntry = new_PriceListEntry(priceLineId, "STD")
    
    With newPriceListEntry
@@ -121,14 +122,14 @@ Private Function createNewPriceListEntry(priceLineId As String) As PriceListEntr
 End Function
 
 
-Private Function clonePriceListEntry(rst As ADODB.Recordset) As PriceListEntry
+Private Function clonePriceListEntry(rst As ADODB.Recordset) As dom_PriceListEntry
 ' Return a clone of given priceListEntry as a new (non-persistent) object
    
-   Dim newPriceListEntry   As PriceListEntry
+   Dim newPriceListEntry   As dom_PriceListEntry
    Set newPriceListEntry = new_PriceListEntry(rst!PriceLine_Id, "STD")
 
    With newPriceListEntry
-'      .setId (rst!id)
+'      .setId (rst!id); pitäisikö tämän olla .setId (0)
       .setPrice (rst!price)
       .setUnit (rst!priceUnit)
       .setType (rst!priceType)
@@ -148,7 +149,7 @@ Private Function clonePriceListEntry(rst As ADODB.Recordset) As PriceListEntry
 End Function
 
 
-Public Sub savePriceListEnrty(priceEntry As PriceListEntry)
+Public Sub savePriceListEnrty(priceEntry As dom_PriceListEntry)
 ' Save price list entry data in database with use cases
 ' - new price - no previous prices (insert new)
 ' - new price - is current price (update current end data, insert new)
@@ -156,7 +157,7 @@ Public Sub savePriceListEnrty(priceEntry As PriceListEntry)
 ' - edit current price (update (comment))
 ' - edit old price (update (comment))
 
-   Dim currentPriceListEntry  As PriceListEntry
+   Dim currentPriceListEntry  As dom_PriceListEntry
    
    If priceEntry.isNew Then
       Set currentPriceListEntry = getCurrentPriceListEntry
@@ -179,9 +180,9 @@ Public Sub savePriceListEnrty(priceEntry As PriceListEntry)
 End Sub
 
 
-Private Function getCurrentPriceListEntry() As PriceListEntry
+Private Function getCurrentPriceListEntry() As dom_PriceListEntry
 
-   Dim rst                    As ADODB.Recordset
+   Dim rst  As ADODB.Recordset
    
    Set rst = dba.getCurrentPriceListEntry(oPriceLineCode)
    

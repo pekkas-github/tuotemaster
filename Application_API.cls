@@ -6,44 +6,37 @@ Attribute VB_Name = "Application_API"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
-Attribute VB_Exposed = False
+Attribute VB_Exposed = True
 Option Compare Database
 Option Explicit
 
-
-Public Function Entities() As Entities
+Public Function getDbConn() As ADODB.Connection
+   Static dbConn  As ADODB.Connection
    
-   Set Entities = New Entities
-   Call Entities.init
-      
-End Function
-
-
-Public Function Services() As Services
-
-   Set Services = New Services
+   If dbConn Is Nothing Then
+      Set dbConn = CurrentProject.Connection
+   End If
    
-End Function
-
-Public Function Descriptions() As Descriptions
-
-   Set Descriptions = New Descriptions
-   Call Descriptions.init
-   
-End Function
-
-Public Function Statuses() As Statuses
-
-   Set Statuses = New Statuses
-   Call Statuses.init
+   Set getDbConn = dbConn
    
 End Function
 
 
-Public Function Decisions() As Decisions
-
-   Set Decisions = New Decisions
-   Call Decisions.init
+Public Function getCategories() As repo_Categories
+   
+   Set getCategories = new_Categories
    
 End Function
 
+
+Public Function getProducts() As repo_Products
+   
+   Set getProducts = new_Products
+   
+End Function
+
+Public Function Statuses() As repo_Statuses
+
+   Set Statuses = new_Statuses
+   
+End Function

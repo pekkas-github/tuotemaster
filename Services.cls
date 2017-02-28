@@ -16,7 +16,7 @@ Private db  As Dba_Services
 
 Private Sub Class_Initialize()
 
-   Set db = New Dba_Services
+   Set db = new_Dba_Services
    
 End Sub
 
@@ -32,6 +32,13 @@ Public Function getNextPriceLineCode() As String
     getNextPriceLineCode = nextPriceLineCode
 
 End Function
+
+Public Function getEntityType(entityCode As String) As String
+
+   getEntityType = db.getEntityType(entityCode)
+   
+End Function
+
 Public Function getNextEntityCode(prefix As String) As String
 ' MODIFIED 28.8.2015 in ver. 6.2.0 / Number of digits (6) added because of a change in a function call
 ' Palauttaa seuraavan vapaan entity-koodin kyseiselle entity-tyypille.
@@ -161,6 +168,13 @@ Public Function getVersionId(entityCode As String, versionNro As String) As Long
    getVersionId = DLookup("Id", ITEM_VERSION, "Item_Code = '" & entityCode & "' AND VersionNumber = '" & versionNro & "'")
    
 End Function
+
+Public Function isNameUnique(newName As dom_Name, entityType As String) As Boolean
+
+   isNameUnique = db.isNameUnique(newName, entityType)
+   
+End Function
+
 Private Sub Class_Terminate()
    
    Set db = Nothing

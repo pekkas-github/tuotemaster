@@ -7,7 +7,7 @@ Public Function Main() As Boolean
 '  LIVE version opens the login form automatically
 '  Develop version keeps the system in design mode
 
-   On Error GoTo Catch
+   On Error GoTo catch
    
    Globals.lang = "fin"            ' Default data representation language
    
@@ -18,7 +18,7 @@ Public Function Main() As Boolean
 exitproc:
    Exit Function
 
-Catch:
+catch:
    MsgBox Err.description, , "Error in start-up"
    Resume exitproc
    Resume
@@ -29,14 +29,14 @@ End Function
 Private Sub StartApplication()
 '   Start the application by opening Login form.
 
-   On Error GoTo Catch
+   On Error GoTo catch
    
    DoCmd.OpenForm "Login"
    
 exitproc:
    Exit Sub
         
-Catch:
+catch:
    MsgBox Err.description, , "Opening the login form failed"
    Resume exitproc
    Resume

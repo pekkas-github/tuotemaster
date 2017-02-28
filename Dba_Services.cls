@@ -10,20 +10,14 @@ Attribute VB_Exposed = False
 Option Compare Database
 Option Explicit
 
-Private dbConn As ADODB.Connection
+Private app    As Application_API
 
 Private Sub Class_Initialize()
-'TODO: Replace with init
 
-   Set dbConn = CurrentProject.Connection
+   Set app = new_Application_API
    
 End Sub
 
-
-Public Sub init(conn)
-   Set dbConn = conn
-
-End Sub
 Public Function getLastPriceLineCode() As String
 ' Return the code of the last record in PriceLine table (C0000nnn)
     
@@ -35,6 +29,12 @@ Public Function getLastPriceLineCode() As String
         
 End Function
 
+
+Public Function getEntityType(entityCode As String) As String
+
+   getEntityType = DLookup("Type", CORE_ITEM, "[Code] = '" & entityCode & "'")
+
+End Function
 
 Public Function GetLastEntityCode(entityPrefix) As String
 ' Return the last code of a given entity type.
@@ -61,7 +61,7 @@ Public Function GetVersionNumbers(entityCode As String) As Collection
           "INNER JOIN " & ITEM_VERSION & " AS v ON v.Item_Code = i.Code " & _
           "WHERE i.Code = '" & entityCode & "'"
           
-    rst.Open sql, dbConn, adOpenDynamic, adLockPessimistic
+    rst.Open sql, app.getDbConn, adOpenDynamic, adLockPessimistic
     
     While Not rst.EOF
         number = rst(0)
@@ -89,7 +89,7 @@ Public Function getVersionIds(entityCode As String) As Collection
          "INNER JOIN " & ITEM_VERSION & " AS v ON v.Item_Code = i.Code " & _
          "WHERE i.Code = '" & entityCode & "'"
           
-   rst.Open sql, dbConn, adOpenDynamic, adLockPessimistic
+   rst.Open sql, app.getDbConn, adOpenDynamic, adLockPessimistic
    Set col = New Collection
    
    While Not rst.EOF
@@ -111,7 +111,7 @@ Public Sub deleteNames(entityCode As String)
    
    sql = "SELECT * FROM " & ITEM_NAME & " WHERE Item_Code = '" & entityCode & "'"
    
-   rst.Open sql, dbConn, adOpenDynamic, adLockPessimistic
+   rst.Open sql, app.getDbConn, adOpenDynamic, adLockPessimistic
    
    While Not rst.EOF
       rst.Delete
@@ -130,7 +130,7 @@ Public Sub deleteOwners(entityCode As String)
    
    sql = "SELECT * FROM " & ITEM_OWNER & " WHERE Item_Code = '" & entityCode & "'"
    
-   rst.Open sql, dbConn, adOpenDynamic, adLockPessimistic
+   rst.Open sql, app.getDbConn, adOpenDynamic, adLockPessimistic
    
    While Not rst.EOF
       rst.Delete
@@ -149,7 +149,7 @@ Public Sub deleteDescriptions(verId As Long)
    
    sql = "SELECT * FROM " & VERSION_DESCRIPTION & " WHERE ItemVersion_Id = " & verId
    
-   rst.Open sql, dbConn, adOpenDynamic, adLockPessimistic
+   rst.Open sql, app.getDbConn, adOpenDynamic, adLockPessimistic
    
    While Not rst.EOF
       rst.Delete
@@ -168,7 +168,7 @@ Public Sub deleteStatuses(verId As Long)
    
    sql = "SELECT * FROM " & VERSION_STATUS & " WHERE ItemVersion_Id = " & verId
    
-   rst.Open sql, dbConn, adOpenDynamic, adLockPessimistic
+   rst.Open sql, app.getDbConn, adOpenDynamic, adLockPessimistic
    
    While Not rst.EOF
       rst.Delete
@@ -187,7 +187,7 @@ Public Sub deleteDecisions(verId As Long)
    
    sql = "SELECT * FROM " & VERSION_DECISION & " WHERE ItemVersion_Id = " & verId
    
-   rst.Open sql, dbConn, adOpenDynamic, adLockPessimistic
+   rst.Open sql, app.getDbConn, adOpenDynamic, adLockPessimistic
    
    While Not rst.EOF
       rst.Delete
@@ -206,7 +206,7 @@ Public Sub deleteVersion(verId As Long)
    
    sql = "SELECT * FROM " & ITEM_VERSION & " WHERE Id = " & verId
    
-   rst.Open sql, dbConn, adOpenDynamic, adLockPessimistic
+   rst.Open sql, app.getDbConn, adOpenDynamic, adLockPessimistic
    
    While Not rst.EOF
       rst.Delete
@@ -225,7 +225,7 @@ Public Sub deleteProperties(entityCode As String)
    
    sql = "SELECT * FROM " & ITEM_PROPERTY_VALUE & " WHERE Item_Code = '" & entityCode & "'"
    
-   rst.Open sql, dbConn, adOpenDynamic, adLockPessimistic
+   rst.Open sql, app.getDbConn, adOpenDynamic, adLockPessimistic
    
    While Not rst.EOF
       rst.Delete
@@ -244,7 +244,7 @@ Public Sub deleteEntity(entityCode As String)
    
    sql = "SELECT * FROM " & CORE_ITEM & " WHERE Code = '" & entityCode & "'"
    
-   rst.Open sql, dbConn, adOpenDynamic, adLockPessimistic
+   rst.Open sql, app.getDbConn, adOpenDynamic, adLockPessimistic
    
    While Not rst.EOF
       rst.Delete
@@ -255,8 +255,30 @@ Public Sub deleteEntity(entityCode As String)
    Set rst = Nothing
 
 End Sub
+
+Public Function isNameUnique(newName As dom_Name, entityType As String) As Boolean
+' Check uniquenes of the name among entities of this type
+
+   Dim sql  As String
+   Dim rst As New ADODB.Recordset
+
+   sql = "SELECT n.Text FROM " & ITEM_NAME & " AS n INNER JOIN " & CORE_ITEM & " AS i ON i.Code = n.Item_Code " & _
+         " WHERE i.Type = '" & entityType & "'AND n.Text = '" & newName.getText & "' AND Lang_Code = '" & newName.getLanguage & "'"
+         
+   rst.Open sql, app.getDbConn, adOpenDynamic, adLockPessimistic
+   
+   If rst.EOF Then
+      isNameUnique = True
+   Else
+      isNameUnique = False
+   End If
+   
+   Set rst = Nothing
+   
+End Function
+
 Private Sub Class_Terminate()
 
-   Set dbConn = Nothing
+   Set app = Nothing
    
 End Sub

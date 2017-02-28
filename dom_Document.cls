@@ -2,7 +2,7 @@ VERSION 1.0 CLASS
 BEGIN
   MultiUse = -1  'True
 END
-Attribute VB_Name = "Document"
+Attribute VB_Name = "dom_Document"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
@@ -31,13 +31,13 @@ Public Function openDocument() As Boolean
 ' Return false value, if document is not found from URL location.
 ' Use VBA-class Application
     
-On Error GoTo Catch
+On Error GoTo catch
     
    Application.FollowHyperlink oURL
    openDocument = True
    Exit Function
 
-Catch:
+catch:
     ' Error if the document is not found
     openDocument = False
 

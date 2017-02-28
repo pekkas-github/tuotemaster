@@ -27,6 +27,7 @@ Public clipBoard        As Collection   ' temporary storage for copy and paste
    Public Const CORE_ITEM             As String = "dbo_Item"
    Public Const ITEM_NAME             As String = "dbo_ItemName"
    Public Const ITEM_OWNER            As String = "dbo_ItemOwner"
+   Public Const ITEM_TYPE             As String = "dbo_ItemType"
    Public Const ITEM_VERSION          As String = "dbo_ItemVersion"
    Public Const VERSION_STATUS        As String = "dbo_ItemVersionStatus"
    Public Const VERSION_DESCRIPTION   As String = "dbo_ItemVersionDescription"
@@ -89,7 +90,7 @@ Public clipBoard        As Collection   ' temporary storage for copy and paste
    Public Type entityFilter
       code     As String
       Name     As String
-      Status   As Integer
+      status   As Integer
       Owner    As String
    End Type
    

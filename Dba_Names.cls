@@ -10,18 +10,12 @@ Attribute VB_Exposed = False
 Option Compare Database
 Option Explicit
 
-Private dbConn As ADODB.Connection
+Private app    As Application_API
 
 
 Private Sub Class_Initialize()
-'TODO: Replace this with init
-   Set dbConn = CurrentProject.Connection
-   
-End Sub
 
-
-Public Sub init(conn As ADODB.Connection)
-   Set dbConn = conn
+   Set app = new_Application_API
    
 End Sub
 
@@ -42,41 +36,21 @@ Public Function getName(entityCode As String, language As String) As ADODB.Recor
    sql = "SELECT * FROM " & ITEM_NAME & _
          " WHERE Item_Code = '" & entityCode & "' AND Lang_Code = '" & language & "'"
    
-   rst.Open sql, dbConn, adOpenDynamic, adLockPessimistic
+   rst.Open sql, app.getDbConn, adOpenDynamic, adLockPessimistic
    
    Set getName = rst
    Set rst = Nothing
 
 End Function
 
-Public Function isNameUnique(newName As EntityName, entityType As String) As Boolean
-' Check uniquenes of the name among entities of this type
-
-   Dim sql  As String
-   Dim rst As New ADODB.Recordset
-
-   sql = "SELECT n.Text FROM " & ITEM_NAME & " AS n INNER JOIN " & CORE_ITEM & " AS i ON i.Code = n.Item_Code " & _
-         " WHERE i.Type = '" & entityType & "'AND n.Text = '" & newName.getText & "' AND Lang_Code = '" & newName.getLanguage & "'"
-         
-   rst.Open sql, dbConn, adOpenDynamic, adLockPessimistic
-   
-   If rst.EOF Then
-      isNameUnique = True
-   Else
-      isNameUnique = False
-   End If
-   
-   Set rst = Nothing
-   
-End Function
 
 
-Public Sub insertName(entityCode As String, newName As EntityName)
+Public Sub insertName(entityCode As String, newName As dom_Name)
 ' Insert a new name record into database
 
    Dim rst  As New ADODB.Recordset
    
-   rst.Open ITEM_NAME, dbConn, adOpenDynamic, adLockPessimistic
+   rst.Open ITEM_NAME, app.getDbConn, adOpenDynamic, adLockPessimistic
    
    rst.AddNew
    rst!text = newName.text
@@ -89,7 +63,7 @@ Public Sub insertName(entityCode As String, newName As EntityName)
 End Sub
 
 
-Public Sub updateName(entityCode As String, currentName As EntityName)
+Public Sub updateName(entityCode As String, currentName As dom_Name)
 ' Update the name text of an existing name record
 
    Dim sql  As String
@@ -98,7 +72,7 @@ Public Sub updateName(entityCode As String, currentName As EntityName)
    sql = "SELECT * FROM " & ITEM_NAME & _
          " WHERE Item_Code = '" & entityCode & "' AND Lang_Code='" & currentName.lang & "'"
          
-   rst.Open sql, dbConn, adOpenDynamic, adLockPessimistic
+   rst.Open sql, app.getDbConn, adOpenDynamic, adLockPessimistic
    
    rst!text = currentName.text
    rst.Update
@@ -110,7 +84,7 @@ End Sub
 
 Private Sub Class_Terminate()
 
-   Set dbConn = Nothing
-
+   Set app = Nothing
+   
 End Sub
 

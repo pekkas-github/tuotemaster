@@ -12,19 +12,21 @@ Option Explicit
 
 Private oVersionId   As Long
 Private db           As Dba_PriceLines
+Private util         As Services
 
 
 Public Sub init(salesItemCode As String, salesItemVersion As String)
 
    oVersionId = DLookup("Id", ITEM_VERSION, "Item_Code = '" & salesItemCode & "' AND VersionNumber = '" & salesItemVersion & "'")
    Set db = New Dba_PriceLines
+   Set util = new_Services
    
 End Sub
 
 
-Public Function createPriceLine() As PriceLine
+Public Function createPriceLine() As dom_PriceLine
 
-   Dim newPriceLine  As New PriceLine
+   Dim newPriceLine  As dom_PriceLine
    Set newPriceLine = new_PriceLine
    
    With newPriceLine
@@ -41,10 +43,10 @@ Public Function createPriceLine() As PriceLine
 End Function
 
 
-Public Function getPriceLine(priceLineCode As String) As PriceLine
+Public Function getPriceLine(priceLineCode As String) As dom_PriceLine
 
    Dim rst           As ADODB.Recordset
-   Dim objPriceLine  As PriceLine
+   Dim objPriceLine  As dom_PriceLine
    
    Set rst = db.getPriceLine(priceLineCode)
    
@@ -65,12 +67,12 @@ Public Function getPriceLine(priceLineCode As String) As PriceLine
 End Function
 
 
-Public Sub savePriceLine(newPriceLine As PriceLine)
+Public Sub savePriceLine(newPriceLine As dom_PriceLine)
    Dim app  As Application_API
-   Set app = New Application_API
+   Set app = new_Application_API
 
    If newPriceLine.isNew Then
-      newPriceLine.setCode (app.Services.getNextPriceLineCode)
+      newPriceLine.setCode (util.getNextPriceLineCode)
       Call db.insertPriceLine(newPriceLine, oVersionId)
    Else
       Call db.updatePriceLine(newPriceLine)
@@ -80,3 +82,9 @@ Public Sub savePriceLine(newPriceLine As PriceLine)
    
 End Sub
 
+Private Sub Class_Terminate()
+
+   Set util = Nothing
+   Set db = Nothing
+   
+End Sub

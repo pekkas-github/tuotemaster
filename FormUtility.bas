@@ -2,6 +2,21 @@ Attribute VB_Name = "FormUtility"
 Option Compare Database
 Option Explicit
 
+Private myForms   As Collection  ' Collection of open multi-selectable form objects
+
+Public Sub openFormProduct(selectedProduct As dom_Product)
+' Create, open and store reference of a multi-selectable form
+
+   Set Args = New Collection
+   Args.Add selectedProduct, "Product"
+   
+   openNewForm New Form_Product
+
+End Sub
+
+Private Sub openNewForm(newForm As Form)
+
+End Sub
 
 Public Function showItemCount(list As ListBox) As Integer
 ' This functions corrects a bug in VBA list count.

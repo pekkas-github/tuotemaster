@@ -106,7 +106,7 @@ Public Sub unMap(childEntity As Entity, parentEntity As Entity)
 End Sub
 
 
-Public Sub map(childEntity As Entity, parentEntity As Entity)
+Public Sub map(childEntity As If_Entity, parentEntity As If_Entity)
 '   Connect the child entity under the selected entity
     
     'If item is already mapped then skip

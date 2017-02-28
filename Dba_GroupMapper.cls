@@ -11,25 +11,19 @@ Option Compare Database
 Option Explicit
 
 Private app    As Application_API
-Private dbConn As ADODB.Connection
+Private util   As Services
 
 
 Private Sub Class_Initialize()
-'TODO: Replace this with init
-   Set app = New Application_API
-   Set dbConn = CurrentProject.Connection
+   
+   Set app = new_Application_API
+   Set util = new_Services
    
 End Sub
 
-Public Sub init(conn As ADODB.Connection)
-   
-   Set app = New Application_API
-   Set dbConn = conn
-   
-End Sub
 
 Public Function isMappedToParent(childEntity As Object, parentEntity As Object) As Boolean
-' Chack if the child is already mapped to the parent
+' Check if the child is already mapped to the parent
 
     Dim rst As New ADODB.Recordset
     Dim sql As String
@@ -37,7 +31,7 @@ Public Function isMappedToParent(childEntity As Object, parentEntity As Object) 
     sql = "SELECT * FROM " & GROUP_HIERARCHY & _
           " WHERE Child_Code = '" & childEntity.getCode & "' AND Parent_Code = '" & parentEntity.getCode & "'"
           
-    rst.Open sql, dbConn, adOpenKeyset
+    rst.Open sql, app.getDbConn, adOpenKeyset
     
     If rst.EOF Then
         isMappedToParent = False
@@ -55,7 +49,7 @@ Public Sub insertInGroupHierarchy(childEntity As Object, parentEntity As Object)
 
     Dim rst As New ADODB.Recordset
     
-    rst.Open GROUP_HIERARCHY, dbConn, adOpenDynamic, adLockPessimistic
+    rst.Open GROUP_HIERARCHY, app.getDbConn, adOpenDynamic, adLockPessimistic
     
     rst.AddNew
     rst!Child_Code = childEntity.getCode
@@ -81,7 +75,7 @@ Public Sub deleteFromGroupHierarchy(childEntity As Object, parentEntity As Objec
     sql = "SELECT * FROM " & GROUP_HIERARCHY & _
           " WHERE Child_Code = '" & childEntity.getCode & "' AND Parent_Code = '" & parentEntity.getCode & "'"
           
-    rst.Open sql, dbConn, , adLockPessimistic
+    rst.Open sql, app.getDbConn, , adLockPessimistic
     rst.Delete
     rst.Update
 
@@ -106,7 +100,7 @@ Public Sub deleteOrphanGroups()
    
    Do
       Set rst = New ADODB.Recordset
-      rst.Open sql, dbConn, adOpenDynamic, adLockPessimistic
+      rst.Open sql, app.getDbConn, adOpenDynamic, adLockPessimistic
       While Not rst.EOF
          rst.Delete
          rst.Update
@@ -123,10 +117,10 @@ Public Sub deleteOrphanGroups()
          "LEFT JOIN " & GROUP_HIERARCHY & " AS g ON i.Code = g.Child_Code " & _
          "WHERE g.Child_Code Is Null AND (i.Type = 'CAT' OR i.Type = 'GRP')"
          
-   rst.Open sql, dbConn, adOpenDynamic, adLockPessimistic
+   rst.Open sql, app.getDbConn, adOpenDynamic, adLockPessimistic
    
    While Not rst.EOF
-      Call app.Services.deleteEntityPermanently(rst!code)
+      Call util.deleteEntityPermanently(rst!code)
       rst.MoveNext
    Wend
    
@@ -135,7 +129,7 @@ Public Sub deleteOrphanGroups()
 End Sub
 Private Sub Class_Terminate()
 
-   Set dbConn = Nothing
    Set app = Nothing
+   Set util = Nothing
    
 End Sub

@@ -10,21 +10,16 @@ Attribute VB_Exposed = False
 Option Compare Database
 Option Explicit
 
-Private dbConn As ADODB.Connection
+Private app    As Application_API
 
 
 Private Sub Class_Initialize()
-'TODO: Replace with init
 
-   Set dbConn = CurrentProject.Connection
+   Set app = new_Application_API
    
 End Sub
 
 
-Public Sub init(conn As ADODB.Connection)
-   Set dbConn = conn
-
-End Sub
 Public Function getThisEntityOwner(entityCode As String) As ADODB.Recordset
 
    Dim sql           As String
@@ -34,7 +29,7 @@ Public Function getThisEntityOwner(entityCode As String) As ADODB.Recordset
          " WHERE Item_Code = '" & entityCode & "' " & _
          "AND Valid_From <= " & TODAY & " AND Valid_To > " & TODAY
    
-   rst.Open sql, dbConn, adOpenDynamic, adLockPessimistic
+   rst.Open sql, app.getDbConn, adOpenDynamic, adLockPessimistic
 
    Set getThisEntityOwner = rst
    Set rst = Nothing
@@ -55,7 +50,7 @@ Public Function getParentEntityOwner(entityCode As String) As ADODB.Recordset
          "WHERE h.Child_Code = '" & entityCode & "' " & _
          "AND o.Valid_From <= " & TODAY & " AND o.Valid_To > " & TODAY
    
-   rst.Open sql, dbConn, adOpenDynamic, adLockPessimistic
+   rst.Open sql, app.getDbConn, adOpenDynamic, adLockPessimistic
 
    Set getParentEntityOwner = rst
    Set rst = Nothing
@@ -71,7 +66,7 @@ Public Function getPersonName(personId As Long) As String
    
    sql = "SELECT PersonName FROM " & PARTY & " WHERE Id = " & personId
    
-   rst.Open sql, dbConn, adOpenDynamic, adLockPessimistic
+   rst.Open sql, app.getDbConn, adOpenDynamic, adLockPessimistic
    
    getPersonName = rst(0)
    
@@ -80,11 +75,11 @@ Public Function getPersonName(personId As Long) As String
 End Function
 
 
-Public Sub insertOwner(entityCode As String, newOwner As Owner)
+Public Sub insertOwner(entityCode As String, newOwner As dom_Owner)
    
    Dim rst  As New ADODB.Recordset
    
-   rst.Open ITEM_OWNER, dbConn, adOpenDynamic, adLockPessimistic
+   rst.Open ITEM_OWNER, app.getDbConn, adOpenDynamic, adLockPessimistic
    
    With rst
       .AddNew
@@ -108,7 +103,7 @@ Public Sub updateOwner(entityCode, currentOwner)
          " WHERE Item_Code = '" & entityCode & "' " & _
          "AND Valid_From <= " & TODAY & " AND Valid_To > " & TODAY
          
-   rst.Open sql, dbConn, adOpenDynamic, adLockPessimistic
+   rst.Open sql, app.getDbConn, adOpenDynamic, adLockPessimistic
    
    rst!Party_Id = currentOwner.getPersonId
    rst!valid_to = currentOwner.getEndDate
@@ -121,6 +116,7 @@ End Sub
 
 Private Sub Class_Terminate()
 
-   Set dbConn = Nothing
+   Set app = Nothing
    
 End Sub
+

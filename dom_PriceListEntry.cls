@@ -2,7 +2,7 @@ VERSION 1.0 CLASS
 BEGIN
   MultiUse = -1  'True
 END
-Attribute VB_Name = "PriceListEntry"
+Attribute VB_Name = "dom_PriceListEntry"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
@@ -10,8 +10,6 @@ Attribute VB_Exposed = True
 Option Compare Database
 Option Explicit
 
-'CREATED 10.9.2015 in ver 6.2.0
-'MODIFIED 20.3.2016 in ver 6.4.0 (added oActive)
 
 Private oId             As Long
 Private oPriceLineId    As String
@@ -27,7 +25,7 @@ Private oActive         As Boolean
 Private oComment        As String
 Private oIsNew          As Boolean
 Private oIsModified     As Boolean
-Private Status          As String   ' effective, coming
+Private status          As String   ' effective, coming (t‰st‰ pit‰isi p‰‰st‰ eroon)
 
 
 Public Sub init(priceLineCode As String, priceListCode As String)
@@ -174,12 +172,12 @@ Public Sub setComment(value As String)
 End Sub
 
 Public Function getStatus() As String
-    getStatus = Status
+    getStatus = status
     
 End Function
 
 Public Sub setStatus(value As String)
-    Status = value
+    status = value
     
 End Sub
 Public Property Get isNew() As Boolean

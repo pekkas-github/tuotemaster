@@ -10,20 +10,18 @@ Attribute VB_Exposed = False
 Option Compare Database
 Option Explicit
 
-' This is a super class for all sub-classes that implement an Names_IF interface.
+' This is a super class for all sub-classes that implement an If_Names interface.
 ' Methods that are common for all sub-classes are delegated to this class.
 
 Private db           As Dba_Names
 Private parentCode   As String
-Private parentType   As String
 '
 
-Public Sub init(entityCode As String, entityType As String)
+Public Sub init(entityCode As String)
 ' constructor
 
-   Set db = New Dba_Names
+   Set db = new_Dba_Names
    parentCode = entityCode
-   parentType = entityType
    
 End Sub
 
@@ -35,7 +33,7 @@ End Sub
 
 '---- METHODS -----------------
 
-Public Function getName(language As String) As EntityName
+Public Function getName(language As String) As dom_Name
 ' Return the name of a specific entity with requested language as a name object.
 ' If no name then return dummy name
 
@@ -54,11 +52,11 @@ Public Function getName(language As String) As EntityName
 End Function
 
 
-Public Sub saveName(newName As EntityName)
+Public Sub saveName(newName As dom_Name)
 ' Create a new name record or update an existing one.
 ' Name validation has been done in concrete class.
 
-   Dim currentName   As EntityName
+   Dim currentName   As dom_Name
    
 '  Check if there is a current name with this language
    Set currentName = getName(newName.lang)
