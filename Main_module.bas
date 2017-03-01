@@ -2,14 +2,15 @@ Attribute VB_Name = "Main_module"
 Option Compare Database
 Option Explicit
 
-Public Function Main() As Boolean
+Public Function Main(defaultLanguage As String) As Boolean
 '  Application starts from here.
 '  LIVE version opens the login form automatically
 '  Develop version keeps the system in design mode
 
    On Error GoTo catch
    
-   Globals.lang = "fin"             ' Default data representation language
+   Globals.lang = defaultLanguage   ' Default data representation language
+   FormUtility.initFormUtility      ' Initialize Form Utility service
    
    If Globals.IS_LIVE Then
       StartApplication
@@ -31,7 +32,7 @@ Private Sub StartApplication()
 
    On Error GoTo catch
    
-   DoCmd.OpenForm "Login"
+   DoCmd.openForm "Login"
    
 exitproc:
    Exit Sub

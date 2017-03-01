@@ -68,7 +68,7 @@ Public Function createProduct(Optional versionNro As String = "1.0") As dom_Prod
 '  Add the new product in PROD collection in group hierarchy
    Set mapper = New GroupMapper
    Set rootProduct = getProduct("PROD")
-   mapper.map newProduct, rootProduct
+   mapper.map newProduct.getCode, newProduct.getType, rootProduct.getCode, rootProduct.getType
    
    Set createProduct = newProduct
    

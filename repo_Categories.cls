@@ -73,8 +73,8 @@ Public Function createCategory(categoryType As String, parentCode As String) As 
 '  Add the new category in its parent
    Set mapper = New GroupMapper
    Set parentCategory = getCategory(parentCode)
-   mapper.map newCategory, parentCategory
-   
+   mapper.map newCategory.getCode, newCategory.getType, parentCategory.getCode, parentCategory.getType
+
    Set createCategory = newCategory
    
    Set newCategory = Nothing

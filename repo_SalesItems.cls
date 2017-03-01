@@ -70,7 +70,7 @@ Public Function createSalesItem(Optional versionNro As String = "1.0") As dom_Sa
 '  Associate the new sales item to its parent product in group hierarchy
    Set mapper = New GroupMapper
    Set parentProduct = app.getProducts.getProduct(oProductCode)
-   mapper.map retSalesItem, parentProduct
+   mapper.map retSalesItem.getCode, retSalesItem.getType, parentProduct.getCode, parentProduct.getType
    
    Set createSalesItem = retSalesItem
    

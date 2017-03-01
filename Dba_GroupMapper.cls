@@ -22,14 +22,14 @@ Private Sub Class_Initialize()
 End Sub
 
 
-Public Function isMappedToParent(childEntity As Object, parentEntity As Object) As Boolean
+Public Function isMappedToParent(childCode As String, parentCode As String) As Boolean
 ' Check if the child is already mapped to the parent
 
     Dim rst As New ADODB.Recordset
     Dim sql As String
     
     sql = "SELECT * FROM " & GROUP_HIERARCHY & _
-          " WHERE Child_Code = '" & childEntity.getCode & "' AND Parent_Code = '" & parentEntity.getCode & "'"
+          " WHERE Child_Code = '" & childCode & "' AND Parent_Code = '" & parentCode & "'"
           
     rst.Open sql, app.getDbConn, adOpenKeyset
     
@@ -44,7 +44,49 @@ Public Function isMappedToParent(childEntity As Object, parentEntity As Object) 
 End Function
 
 
-Public Sub insertInGroupHierarchy(childEntity As Object, parentEntity As Object)
+Public Function isMappedToParent_old(childEntity As Object, parentEntity As Object) As Boolean
+' WILL BE DELETED; NAME HAS BEEN CHANGED
+' Check if the child is already mapped to the parent
+
+    Dim rst As New ADODB.Recordset
+    Dim sql As String
+    
+    sql = "SELECT * FROM " & GROUP_HIERARCHY & _
+          " WHERE Child_Code = '" & childEntity.getCode & "' AND Parent_Code = '" & parentEntity.getCode & "'"
+          
+    rst.Open sql, app.getDbConn, adOpenKeyset
+    
+    If rst.EOF Then
+        isMappedToParent_old = False
+    Else
+        isMappedToParent_old = True
+    End If
+    
+    Set rst = Nothing
+    
+End Function
+Public Sub insertInGroupHierarchy(childCode As String, childType As String, parentCode As String, parentType As String)
+' Maps the child group or item reference to the parent entity
+
+    Dim rst As New ADODB.Recordset
+    
+    rst.Open GROUP_HIERARCHY, app.getDbConn, adOpenDynamic, adLockPessimistic
+    
+    rst.AddNew
+    rst!Child_Code = childCode
+    rst!Child_Type = childType
+    rst!Parent_Code = parentCode
+    rst!Parent_Type = parentType
+    
+    rst.Update
+    rst.Close
+    Set rst = Nothing
+
+End Sub
+
+
+Public Sub insertInGroupHierarchy_old(childEntity As Object, parentEntity As Object)
+' WILL BE DELETED; NAME HAS BEEN CHANGED
 ' Maps the child group or item reference to the parent entity
 
     Dim rst As New ADODB.Recordset
@@ -63,8 +105,28 @@ Public Sub insertInGroupHierarchy(childEntity As Object, parentEntity As Object)
 
 End Sub
 
+Public Sub deleteFromGroupHierarchy(childCode As String, parentCode As String)
+'   Cut the parent-child connection. Child branch stays orphan unless it is later
+'   connected to another parent group. Orphan groups are cleaned by garbage collection
+'   in "deleteOrphanGroupings" while closing the group mapper.
 
-Public Sub deleteFromGroupHierarchy(childEntity As Object, parentEntity As Object)
+    Dim rst As New ADODB.Recordset
+    Dim sql As String
+    
+    sql = "SELECT * FROM " & GROUP_HIERARCHY & _
+          " WHERE Child_Code = '" & childCode & "' AND Parent_Code = '" & parentCode & "'"
+          
+    rst.Open sql, app.getDbConn, , adLockPessimistic
+    rst.Delete
+    rst.Update
+
+    Set rst = Nothing
+
+End Sub
+
+
+Public Sub deleteFromGroupHierarchy_old(childEntity As Object, parentEntity As Object)
+' WILL BE DELETED; NAME HAS BEEN CHANGED
 '   Cut the parent-child connection. Child branch stays orphan unless it is later
 '   connected to another parent group. Orphan groups are cleaned by garbage collection
 '   in "deleteOrphanGroupings" while closing the group mapper.
