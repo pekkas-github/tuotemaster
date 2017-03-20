@@ -47,19 +47,14 @@ Public Function createProduct(Optional versionNro As String = "1.0") As dom_Prod
    Dim newProduct          As dom_Product
    Dim rootProduct         As dom_Product
    Dim mapper              As GroupMapper
-   Dim nameBehavior        As If_Names
-   Dim ownerBehavior       As If_Owners
    Dim productCode         As String
    
 '  Find next available product code; it's needed in next actions
    productCode = util.getNextEntityCode("MR")
 
-'  Define name and owner behavior specific for Product entities
-   Set nameBehavior = new_Names_Unique(productCode)
-   Set ownerBehavior = new_Owners_Self
 
 '  Create, construct and save the new product
-   Set newProduct = new_Product(productCode, versionNro, nameBehavior, ownerBehavior)
+   Set newProduct = new_Product(productCode, versionNro)
    newProduct.isNew = True
    Me.save newProduct
 '  Create and save the version part of the product
@@ -74,8 +69,6 @@ Public Function createProduct(Optional versionNro As String = "1.0") As dom_Prod
    
    Set newProduct = Nothing
    Set rootProduct = Nothing
-   Set nameBehavior = Nothing
-   Set ownerBehavior = Nothing
    Set mapper = Nothing
    
 End Function
@@ -85,27 +78,20 @@ Public Function getProduct(productCode As String, Optional versionNro As String 
 ' Return a persistent product. If the version number is not specified, return the last version.
 
    Dim returnProduct    As dom_Product
-   Dim nameBehavior     As If_Names
-   Dim ownerBehavior    As If_Owners
    
 '  Define the version number and get version object
    If versionNro = "last" Then
       versionNro = util.getLastVersionNumber(productCode)
    End If
       
-'  Define name and owner behavior
-   Set nameBehavior = new_Names_Unique(productCode)
-   Set ownerBehavior = new_Owners_Self
 
 '  Build a new product entity
-   Set returnProduct = new_Product(productCode, versionNro, nameBehavior, ownerBehavior)
+   Set returnProduct = new_Product(productCode, versionNro)
    returnProduct.isNew = False
    
    Set getProduct = returnProduct
    
    Set returnProduct = Nothing
-   Set nameBehavior = Nothing
-   Set ownerBehavior = Nothing
    
 End Function
 

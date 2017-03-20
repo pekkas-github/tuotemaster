@@ -12,7 +12,7 @@ Option Explicit
 
 ' Class: PriceLine
 '
-Private oCode                    As String
+Private oCode                    As String   ' PriceLine Id of this price line
 Private oPriceLineText           As String
 Private oBusinessTypeBasic       As String
 Private oBusinessTypeOverride    As String

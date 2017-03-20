@@ -54,11 +54,11 @@ Public Function rsProducts(filters As Collection) As String
        
    'Code
    If Not filters("Code") = "" Then
-       where = where & " AND i.Code Like '" & filters("Code") & "'"
+       where = where & " AND i.Code Like '" & WILD_CARD & filters("Code") & WILD_CARD & "'"
    End If
    'Name
    If Not filters("Name") = "" Then
-       where = where & " AND n.Text Like '" & filters("Name") & "'"
+       where = where & " AND n.Text Like '" & WILD_CARD & filters("Name") & WILD_CARD & "'"
    End If
    'Status
    If filters("Status") > 0 Then
@@ -71,9 +71,6 @@ Public Function rsProducts(filters As Collection) As String
    
    sql = sql & where & " ORDER BY n.Text"
     
-'  SQL Server uses % as a wildcard character. In UI we want to use * as a wildcard character
-   sql = Replace(sql, "*", WILD_CARD)
-
    rsProducts = sql
          
 End Function
@@ -111,11 +108,11 @@ Public Function rsServices(filters As Collection) As String
        
    'Code
    If Not filters("Code") = "" Then
-       where = where & " AND i.Code Like '" & filters("Code") & "'"
+       where = where & " AND i.Code Like '" & WILD_CARD & filters("Code") & WILD_CARD & "'"
    End If
    'Name
    If Not filters("Name") = "" Then
-       where = where & " AND n.Text Like '" & filters("Name") & "'"
+       where = where & " AND n.Text Like '" & WILD_CARD & filters("Name") & WILD_CARD & "'"
    End If
    'Status
    If filters("Status") > 0 Then
@@ -128,9 +125,6 @@ Public Function rsServices(filters As Collection) As String
    
    sql = sql & where & " ORDER BY n.Text"
     
-'  SQL Server uses % as a wildcard character. In UI we want to use * as a wildcard character
-   sql = Replace(sql, "*", WILD_CARD)
-
    rsServices = sql
          
 End Function
@@ -235,35 +229,35 @@ Public Function rsBillingItems(filters As Collection) As String
    
    'Check the filters
    If Not filters("Järjestelmä") = "" Then
-       where = where & " AND Järjestelmä Like '" & filters("Järjestelmä") & "'"
+       where = where & " AND Järjestelmä Like '" & WILD_CARD & filters("Järjestelmä") & WILD_CARD & "'"
    End If
    
    If Not filters("Tuotetunnus") = "" Then
-       where = where & " AND Tuotetunnus Like '" & filters("Tuotetunnus") & "'"
+       where = where & " AND Tuotetunnus Like '" & WILD_CARD & filters("Tuotetunnus") & WILD_CARD & "'"
    End If
    
    If Not filters("Tuotenimi") = "" Then
-       where = where & " AND Tuotenimi Like '" & filters("Tuotenimi") & "'"
+       where = where & " AND Tuotenimi Like '" & WILD_CARD & filters("Tuotenimi") & WILD_CARD & "'"
    End If
    
    If Not filters("Tuotetyyppi") = "" Then
-       where = where & " AND Tuotetyyppi Like '" & filters("Tuotetyyppi") & "'"
+       where = where & " AND Tuotetyyppi Like '" & WILD_CARD & filters("Tuotetyyppi") & WILD_CARD & "'"
    End If
    
    If Not filters("Tuoteryhmä") = "" Then
-       where = where & " AND Tuoteryhmä Like '" & filters("Tuoteryhmä") & "'"
+       where = where & " AND Tuoteryhmä Like '" & WILD_CARD & filters("Tuoteryhmä") & WILD_CARD & "'"
    End If
    
    If Not filters("TRnimi") = "" Then
-       where = where & " AND [Tuoteryhmän nimi] Like '" & filters("TRnimi") & "'"
+       where = where & " AND [Tuoteryhmän nimi] Like '" & WILD_CARD & filters("TRnimi") & WILD_CARD & "'"
    End If
    
    If Not filters("Käyttöluokka") = "" Then
-       where = where & " AND Käyttöluokka Like '" & filters("Käyttöluokka") & "'"
+       where = where & " AND Käyttöluokka Like '" & WILD_CARD & filters("Käyttöluokka") & WILD_CARD & "'"
    End If
    
    If Not filters("SAPkoodi") = "" Then
-       where = where & " AND [refSAP-koodi] Like '" & filters("SAPkoodi") & "'"
+       where = where & " AND [refSAP-koodi] Like '" & WILD_CARD & filters("SAPkoodi") & WILD_CARD & "'"
    End If
    
    If Not filters("Mapping") = 0 Then
@@ -283,7 +277,6 @@ Public Function rsBillingItems(filters As Collection) As String
             "INNER JOIN " & BILLING_STATUS_NAME & " AS n ON m.StatusName_Id = n.Id "
       
       sql = sql & "WHERE 1=1 " & where
-      sql = Replace(sql, "*", WILD_CARD)
    End If
    
    rsBillingItems = sql

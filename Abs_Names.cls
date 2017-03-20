@@ -14,7 +14,7 @@ Option Explicit
 ' Methods that are common for all sub-classes are delegated to this class.
 
 Private db           As Dba_Names
-Private parentCode   As String
+Private parentCode   As String      'reference to the parent code
 '
 
 Public Sub init(entityCode As String)

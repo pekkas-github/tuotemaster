@@ -10,14 +10,14 @@ Attribute VB_Exposed = True
 Option Compare Database
 Option Explicit
 
-Private oVersionId   As Long
+Private oVersionId   As Long           ' Reference to parent SalesItem version
 Private db           As Dba_PriceLines
 Private util         As Services
 
 
-Public Sub init(salesItemCode As String, salesItemVersion As String)
+Public Sub init(parentSalesItemVersionId As Long)
 
-   oVersionId = DLookup("Id", ITEM_VERSION, "Item_Code = '" & salesItemCode & "' AND VersionNumber = '" & salesItemVersion & "'")
+   oVersionId = parentSalesItemVersionId
    Set db = New Dba_PriceLines
    Set util = new_Services
    
@@ -48,7 +48,11 @@ Public Function getPriceLine(priceLineCode As String) As dom_PriceLine
    Dim rst           As ADODB.Recordset
    Dim objPriceLine  As dom_PriceLine
    
-   Set rst = db.getPriceLine(priceLineCode)
+   Set rst = db.getPriceLine(priceLineCode, oVersionId)
+   
+   If rst.EOF Then
+      Err.Raise vbObjectError, , "Price line is not associated with this SalesItem."
+   End If
    
    Set objPriceLine = new_PriceLine
 

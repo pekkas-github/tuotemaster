@@ -160,7 +160,7 @@ End Sub
 
 Public Sub setOwner(personId As Long, startDate As Date)
 
-   oOwners.saveOwner super.getCode, new_Owner(personId, startDate)
+   oOwners.saveOwner new_Owner(personId, startDate)
    
 End Sub
 
@@ -228,7 +228,7 @@ End Function
 
 Private Function If_Entity_getDocuments() As repo_Documents
 
-' No document action has been defined for Cateory
+' No document action has been defined for SalesItem yet
 
 End Function
 

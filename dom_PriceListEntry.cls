@@ -11,8 +11,7 @@ Option Compare Database
 Option Explicit
 
 
-Private oId             As Long
-Private oPriceLineId    As String
+Private oId             As Long     ' PriceListEntry ID
 Private oPriceListId    As String
 Private oPrice          As Single
 Private oUnit           As String
@@ -25,12 +24,10 @@ Private oActive         As Boolean
 Private oComment        As String
 Private oIsNew          As Boolean
 Private oIsModified     As Boolean
-Private status          As String   ' effective, coming (t‰st‰ pit‰isi p‰‰st‰ eroon)
 
 
-Public Sub init(priceLineCode As String, priceListCode As String)
+Public Sub init(priceListCode As String)
    
-   oPriceLineId = priceLineCode
    oPriceListId = priceListCode
    
 End Sub
@@ -45,18 +42,6 @@ End Function
 Public Sub setId(value As Long)
     oId = value
     
-End Sub
-
-
-Public Function getPriceLineId() As String
-    getPriceLineId = oPriceLineId
-    
-End Function
-
-
-Public Sub setPriceLineId(value As String)
-   oPriceLineId = value
-   
 End Sub
 
 
@@ -171,15 +156,6 @@ Public Sub setComment(value As String)
     
 End Sub
 
-Public Function getStatus() As String
-    getStatus = status
-    
-End Function
-
-Public Sub setStatus(value As String)
-    status = value
-    
-End Sub
 Public Property Get isNew() As Boolean
     isNew = oIsNew
     

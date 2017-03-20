@@ -146,7 +146,7 @@ End Sub
 
 Public Sub setOwner(personId As Long, startDate As Date)
 
-   oOwners.saveOwner super.getCode, new_Owner(personId, startDate)
+   oOwners.saveOwner new_Owner(personId, startDate)
    
 End Sub
 

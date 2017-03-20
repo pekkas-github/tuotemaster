@@ -53,28 +53,28 @@ Public Sub saveStatus(entityCode As String, versionNro As String, NewStatus As d
 ' update the current status
 
    Dim currentStatus As dom_Status
-   Dim versionId     As Long
+   Dim versionID     As Long
    
-   versionId = util.getVersionId(entityCode, versionNro)
+   versionID = util.getVersionId(entityCode, versionNro)
    Set currentStatus = Me.getStatus(entityCode, versionNro)
    
    If currentStatus Is Nothing Then
-      Call insertStatusData(versionId, NewStatus)
+      Call insertStatusData(versionID, NewStatus)
    Else
       If NewStatus.getStartDate = currentStatus.getStartDate Then
          currentStatus.setType (NewStatus.getType)
-         Call updateStatusData(versionId, currentStatus)
+         Call updateStatusData(versionID, currentStatus)
       Else
          currentStatus.setEndDate (NewStatus.getStartDate - 1)
-         Call updateStatusData(versionId, currentStatus)    ' Current status must be updated before the new status is saved (new becomes current)
-         Call insertStatusData(versionId, NewStatus)
+         Call updateStatusData(versionID, currentStatus)    ' Current status must be updated before the new status is saved (new becomes current)
+         Call insertStatusData(versionID, NewStatus)
       End If
    End If
    
 End Sub
 
 
-Private Sub insertStatusData(versionId As Long, NewStatus As dom_Status)
+Private Sub insertStatusData(versionID As Long, NewStatus As dom_Status)
 ' Add a new status into database
 
    Dim rst  As New ADODB.Recordset
@@ -84,7 +84,7 @@ Private Sub insertStatusData(versionId As Long, NewStatus As dom_Status)
    With rst
       .AddNew
       !StatusName_Id = Nz(NewStatus.getType)
-      !ItemVersion_Id = versionId
+      !ItemVersion_Id = versionID
       !Valid_From = NewStatus.getStartDate
       !valid_to = NewStatus.getEndDate
       .Update
@@ -95,7 +95,7 @@ Private Sub insertStatusData(versionId As Long, NewStatus As dom_Status)
 End Sub
 
 
-Private Sub updateStatusData(versionId As Long, currentStatus As dom_Status)
+Private Sub updateStatusData(versionID As Long, currentStatus As dom_Status)
 ' Update an existing status in database; change only status type and end date.
 ' Status type can be changed during the same day when status was created
 ' End date is changed when a new status replaces an old one.
@@ -103,7 +103,7 @@ Private Sub updateStatusData(versionId As Long, currentStatus As dom_Status)
    Dim rst  As New ADODB.Recordset
    Dim sql  As String
       
-   sql = "SELECT * FROM " & VERSION_STATUS & " WHERE ItemVersion_Id = " & versionId & _
+   sql = "SELECT * FROM " & VERSION_STATUS & " WHERE ItemVersion_Id = " & versionID & _
          " AND Valid_From <= " & TODAY & " AND " & TODAY & " < Valid_To"
    
    rst.Open sql, app.getDbConn, adOpenDynamic, adLockPessimistic

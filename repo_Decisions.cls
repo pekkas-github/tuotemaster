@@ -111,9 +111,9 @@ Public Sub saveDecision(entityCode As String, versionNro As String, newDecision 
 ' Insert or update decision data and change the end date of the latest decision
 
    Dim lastDecision  As dom_Decision
-   Dim versionId     As Long
+   Dim versionID     As Long
    
-   versionId = Services.getVersionId(entityCode, versionNro)
+   versionID = Services.getVersionId(entityCode, versionNro)
    
    If Not newDecision.isNew Then
 '     update existing decision
@@ -123,7 +123,7 @@ Public Sub saveDecision(entityCode As String, versionNro As String, newDecision 
       Set lastDecision = getLastDecision(entityCode, versionNro)
       If lastDecision Is Nothing Then
 '        .. no previous decisions -> ineset
-         Call insertDecisionData(newDecision, versionId)
+         Call insertDecisionData(newDecision, versionID)
       ElseIf lastDecision.getStartDate = newDecision.getStartDate Then
 '        .. the same start date with the latest -> update
          lastDecision.setDecisionText (newDecision.getDecisionText)
@@ -133,7 +133,7 @@ Public Sub saveDecision(entityCode As String, versionNro As String, newDecision 
 '           .. not the same start date with the latest
             lastDecision.setEndDate (newDecision.getStartDate - 1)           ' update end date
             Call updateDecisionData(lastDecision)
-            Call insertDecisionData(newDecision, versionId)
+            Call insertDecisionData(newDecision, versionID)
       End If
    End If
    
@@ -142,7 +142,7 @@ Public Sub saveDecision(entityCode As String, versionNro As String, newDecision 
 End Sub
 
    
-Private Sub insertDecisionData(newDecision As dom_Decision, versionId As Long)
+Private Sub insertDecisionData(newDecision As dom_Decision, versionID As Long)
 ' Add a new decision into database
 
    Dim rst        As New ADODB.Recordset
@@ -155,7 +155,7 @@ Private Sub insertDecisionData(newDecision As dom_Decision, versionId As Long)
       !authority = Nz(newDecision.getAuthority)
       !ValidFrom = newDecision.getStartDate
       !ValidTo = newDecision.getEndDate
-      !ItemVersion_Id = versionId
+      !ItemVersion_Id = versionID
       .Update
       newDecision.isNew = False
    End With

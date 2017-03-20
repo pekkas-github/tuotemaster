@@ -53,18 +53,18 @@ Public Sub saveDescription(newDescription As dom_Description)
 ' Create a new description record or update an existing one
 
    Dim currentDescription  As dom_Description
-   Dim versionId           As Long        ' this is utilized in insert and update subroutines
+   Dim versionID           As Long        ' this is utilized in insert and update subroutines
    
    With newDescription
       Set currentDescription = getDescription(.getEntityCode, .getVersionNro, .getLanguage)
-      versionId = Services.getVersionId(.getEntityCode, .getVersionNro)
+      versionID = Services.getVersionId(.getEntityCode, .getVersionNro)
    End With
    
    If currentDescription Is Nothing Then
-      Call insertDescription(versionId, newDescription)
+      Call insertDescription(versionID, newDescription)
    Else
       currentDescription.setText (newDescription.getText)
-      Call updateDescription(versionId, currentDescription)
+      Call updateDescription(versionID, currentDescription)
    End If
    
    Set currentDescription = Nothing
@@ -72,7 +72,7 @@ Public Sub saveDescription(newDescription As dom_Description)
 End Sub
 
 
-Private Sub insertDescription(versionId As Long, newDescription As dom_Description)
+Private Sub insertDescription(versionID As Long, newDescription As dom_Description)
 
    Dim rst        As New ADODB.Recordset
    
@@ -81,7 +81,7 @@ Private Sub insertDescription(versionId As Long, newDescription As dom_Descripti
    rst.AddNew
    rst!description = newDescription.getText
    rst!Lang_Code = newDescription.getLanguage
-   rst!ItemVersion_Id = versionId
+   rst!ItemVersion_Id = versionID
    rst.Update
    
    Set rst = Nothing
@@ -89,13 +89,13 @@ Private Sub insertDescription(versionId As Long, newDescription As dom_Descripti
 End Sub
 
 
-Private Sub updateDescription(versionId As Long, currentDescription As dom_Description)
+Private Sub updateDescription(versionID As Long, currentDescription As dom_Description)
 
    Dim sql        As String
    Dim rst        As New ADODB.Recordset
       
    sql = "SELECT * FROM " & VERSION_DESCRIPTION & _
-         " WHERE ItemVersion_Id = " & versionId & _
+         " WHERE ItemVersion_Id = " & versionID & _
          " AND Lang_Code = '" & currentDescription.getLanguage & "'"
          
    rst.Open sql, dbConn, adOpenDynamic, adLockPessimistic

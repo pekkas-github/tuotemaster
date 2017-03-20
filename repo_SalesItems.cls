@@ -18,7 +18,7 @@ Option Explicit
 Private app          As Application_API
 Private super        As abs_Entities
 Private util         As Services
-Private oProductCode As String
+Private oProductCode As String      ' Reference to the parent product
 
 
 Public Sub init(productCode As String)
@@ -49,22 +49,16 @@ Public Function createSalesItem(Optional versionNro As String = "1.0") As dom_Sa
    Dim retSalesItem        As dom_SalesItem
    Dim parentProduct       As dom_Product
    Dim mapper              As GroupMapper
-   Dim nameBehavior        As If_Names
-   Dim ownerBehavior       As If_Owners
    Dim salesItemCode       As String
    
 '  Find next available sales item code; it's needed in next actions
    salesItemCode = util.getNextEntityCode("MN")
 
-'  Define name and owner behavior specific for sales item entities
-   Set nameBehavior = new_Names_Any(salesItemCode)
-   Set ownerBehavior = new_Owners_Parent
-
 '  Create, construct and save the new sales item
-   Set retSalesItem = new_SalesItem(salesItemCode, versionNro, nameBehavior, ownerBehavior)
+   Set retSalesItem = new_SalesItem(salesItemCode, versionNro)
    retSalesItem.isNew = True
    Me.save retSalesItem
-'  Create and save the version part of the product
+'  Create and save the version part of the sales item
    super.createVersion salesItemCode, versionNro
 
 '  Associate the new sales item to its parent product in group hierarchy
@@ -76,8 +70,6 @@ Public Function createSalesItem(Optional versionNro As String = "1.0") As dom_Sa
    
    Set retSalesItem = Nothing
    Set parentProduct = Nothing
-   Set nameBehavior = Nothing
-   Set ownerBehavior = Nothing
    Set mapper = Nothing
    
 End Function
@@ -87,27 +79,19 @@ Public Function getSalesItem(salesItemCode As String, Optional versionNro As Str
 ' Return a persistent sales item. If the version number is not specified, return the last version.
 
    Dim retSalesItem     As dom_SalesItem
-   Dim nameBehavior     As If_Names
-   Dim ownerBehavior    As If_Owners
    
 '  Define the version number and get version object
    If versionNro = "last" Then
       versionNro = util.getLastVersionNumber(salesItemCode)
    End If
       
-'  Define name and owner behavior
-   Set nameBehavior = new_Names_Any(salesItemCode)
-   Set ownerBehavior = new_Owners_Parent
-
 '  Build a new sales item entity
-   Set retSalesItem = new_SalesItem(salesItemCode, versionNro, nameBehavior, ownerBehavior)
+   Set retSalesItem = new_SalesItem(salesItemCode, versionNro)
    retSalesItem.isNew = False
    
    Set getSalesItem = retSalesItem
    
    Set retSalesItem = Nothing
-   Set nameBehavior = Nothing
-   Set ownerBehavior = Nothing
    
 End Function
 

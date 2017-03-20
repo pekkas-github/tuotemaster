@@ -15,8 +15,8 @@ Option Explicit
 
 Private db           As Dba_Documents
 Private util         As Services
-Private parentCode   As String
-Private versionNro   As String
+Private parentCode   As String      ' Reference to the parent entity
+Private versionNro   As String      ' Reference to the version number of the parent entity
 
 
 Public Sub init(pCode As String, pVer As String)
@@ -86,16 +86,16 @@ End Function
 Public Sub saveDocReference(docRef As dom_Document)
 
    Dim app        As Application_API
-   Dim versionId  As Long
+   Dim versionID  As Long
    
    Set app = new_Application_API
    
-   versionId = util.getVersionId(parentCode, versionNro)
+   versionID = util.getVersionId(parentCode, versionNro)
    
    If docRef.isPersistent Then
       Call db.updateDocReference(docRef)
    Else
-      docRef.setId (db.insertDocReference(versionId, docRef))
+      docRef.setId (db.insertDocReference(versionID, docRef))
    End If
    
    Set app = Nothing

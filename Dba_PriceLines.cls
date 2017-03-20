@@ -20,8 +20,8 @@ End Sub
 
 
 
-Public Function getPriceLine(priceLineCode As String) As ADODB.Recordset
-' Return price line data with finnis price line text.
+Public Function getPriceLine(priceLineCode As String, salesItemVersionId As Long) As ADODB.Recordset
+' Return price line data with finnish price line text.
 ' Business rule is that we use only finnish price line texts.
 ' Database enables however any language.
 
@@ -31,7 +31,7 @@ Public Function getPriceLine(priceLineCode As String) As ADODB.Recordset
    sql = "SELECT p.Id, p.ItemVersion_Id, t.Content, p.BizTypeBasic_Id, p.BizTypeOverride_Id, p.SAPCode " & _
       "FROM " & PRICE_LINE & " AS p " & _
       "INNER JOIN " & PRICE_LINE_TEXT & " AS t ON p.Id = t.PriceLine_Id " & _
-      "WHERE p.Id = '" & priceLineCode & "' AND t.Lang = 'fin'"
+      "WHERE p.Id = '" & priceLineCode & "' AND p.ItemVersion_Id = " & salesItemVersionId & " AND t.Lang = 'fin'"
     
    rst.Open sql, app.getDbConn, adOpenDynamic, adLockPessimistic
    
@@ -41,13 +41,15 @@ Public Function getPriceLine(priceLineCode As String) As ADODB.Recordset
 End Function
 
 
-Public Function getPriceListEntry(id As Long) As ADODB.Recordset
+Public Function getPriceListEntry(priceEntryID As Long, priceLineID As String) As ADODB.Recordset
+' Return the requested price entry data.
+' Ensure that it belongs to a right price line.
 
     Dim sql As String
     Dim rst As New ADODB.Recordset
 
     sql = "SELECT * FROM " & PRICE_LIST_ENTRY & _
-          " WHERE Id = " & id
+          " WHERE Id = " & priceEntryID & " AND PriceLine_Id = '" & priceLineID & "'"
     
     rst.Open sql, app.getDbConn, adOpenDynamic, adLockPessimistic
     
@@ -57,18 +59,24 @@ Public Function getPriceListEntry(id As Long) As ADODB.Recordset
 
 End Function
 
-
 Public Function getCurrentPriceListEntry(priceLineCode As String) As ADODB.Recordset
 '   Return currently valid price list entry; cases:
 '   - no records if there is no priceListEntries
 '   - data of the current priceListEntry in STD pricelist
 
-    Dim sql As String
+    Dim sql                As String
+    Dim sqlCurrentEntry    As String
     Dim rst As New ADODB.Recordset
     
-    sql = "SELECT * FROM " & PRICE_LIST_ENTRY & _
-          " WHERE PriceLine_Id = '" & priceLineCode & "' " & _
-          "AND ValidFrom <= " & TODAY & " AND ValidTo > " & TODAY & "-1 "
+    sqlCurrentEntry = "SELECT PriceLine_Id AS pLineId, Max(ValidFrom) AS StartDate " & _
+                      "FROM " & PRICE_LIST_ENTRY & _
+                      " WHERE PriceLine_Id = '" & priceLineCode & "' " & _
+                      "GROUP BY PriceLine_Id"
+                      
+    sql = "SELECT u.Id, u.PriceLne_Id, u.PriceList_Id, u.Price, u.PriceUnit, u.PriceType, u.ValidFrom, u.VMA, u.VMA_boost, u.Active, u.Comment " & _
+          "FROM " & PRICE_LIST_ENTRY & " AS u " & _
+          " INNER JOIN (" & sqlCurrentEntry & ") AS s " & _
+          "ON (u.PriceLine_Id = s.pLineId AND u.ValidFrom = s.StartDate)"
               
     rst.Open sql, app.getDbConn, adOpenDynamic, adLockPessimistic
     
@@ -81,7 +89,7 @@ End Function
 
 Public Function getLatestPriceListEntry(priceLineCode As String) As ADODB.Recordset
 '   Return the latest price list entry; cases:
-'   - no records if there is no priceListEntries
+'   - no records if there is no priceListEntries yet
 '   - data of the current priceListEntry in STD pricelist
 '   - data of a future priceListEntry in STD priceList
 
@@ -99,7 +107,7 @@ Public Function getLatestPriceListEntry(priceLineCode As String) As ADODB.Record
     Set rst = Nothing
 
 End Function
-Public Sub insertPriceLine(newPriceLine As dom_PriceLine, versionId As Long)
+Public Sub insertPriceLine(newPriceLine As dom_PriceLine, versionID As Long)
     
     Dim rst As New ADODB.Recordset
     
@@ -109,7 +117,7 @@ Public Sub insertPriceLine(newPriceLine As dom_PriceLine, versionId As Long)
 '     Add new price line
       rst.AddNew
       rst!id = .getCode
-      rst!ItemVersion_Id = versionId
+      rst!ItemVersion_Id = versionID
       rst!BizTypeBasic_Id = .getBusinessTypeBasic
       rst!BizTypeOverride_Id = .getBusinessTypeOverride
       rst!sapCode = .getSapCode
@@ -159,7 +167,7 @@ Public Sub updatePriceLine(newPriceLine As dom_PriceLine)
 End Sub
 
 
-Public Sub insertPriceListEntry(priceEntry As dom_PriceListEntry)
+Public Sub insertPriceListEntry(priceEntry As dom_PriceListEntry, priceLineID As String)
 
    Dim rst  As New ADODB.Recordset
    
@@ -167,7 +175,7 @@ Public Sub insertPriceListEntry(priceEntry As dom_PriceListEntry)
    
    With rst
       .AddNew
-      !PriceLine_Id = priceEntry.getPriceLineId
+      !PriceLine_Id = priceLineID
       !PriceList_Id = priceEntry.getPriceListId
       !price = priceEntry.getPrice
       !priceUnit = priceEntry.getUnit

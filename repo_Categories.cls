@@ -61,7 +61,7 @@ Public Function createCategory(categoryType As String, parentCode As String) As 
    Else
       Set nameBehavior = new_Names_Any(categoryCode)
    End If
-   Set ownerBehavior = new_Owners_Self
+   Set ownerBehavior = new_Owners_Self(categoryCode)
 
 '  Create, construct and save the new category/group
    Set newCategory = new_Category(categoryCode, nameBehavior, ownerBehavior)
@@ -95,7 +95,7 @@ Public Function getCategory(catCode As String) As dom_Category
          
 '  Define name and owner behavior
    Set nameBehavior = new_Names_Unique(catCode)
-   Set ownerBehavior = new_Owners_Self
+   Set ownerBehavior = new_Owners_Self(catCode)
 
 '  Build a new category entity
    Set retCategory = new_Category(catCode, nameBehavior, ownerBehavior)

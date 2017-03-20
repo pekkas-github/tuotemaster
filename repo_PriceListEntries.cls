@@ -10,13 +10,17 @@ Attribute VB_Exposed = True
 Option Compare Database
 Option Explicit
 
-Private dba             As Dba_PriceLines
-Private oPriceLineCode  As String
+' PriceListEntry repository is creating, getting and saving PriceListEntries.
+' The only price list used currently is STD.
+
+Private dba             As Dba_PriceLines    ' database operations
+Private oPriceLineID  As String            ' PriceLine that initiated this repository
 '
 
 
-Public Sub init(priceLineCode As String)
-   oPriceLineCode = priceLineCode
+Public Sub init(priceLineID As String)
+
+   oPriceLineID = priceLineID
    Set dba = new_Dba_PriceLines
    
 End Sub
@@ -31,34 +35,38 @@ End Sub
 '---- METHODS ---------------------
 
 
-Public Function getPriceListEntry(priceListEntryId As Long) As dom_PriceListEntry
+Public Function getPriceListEntry(priceEntryID As Long)
 ' Return a selected priceListEntry object from database.
-        
+' Return empty rst if priceEntry is not associated with this priceLine
+   
    Dim rst  As ADODB.Recordset
-   Set rst = dba.getPriceListEntry(priceListEntryId)
-      
+   Set rst = dba.getPriceListEntry(priceEntryID, oPriceLineID)
+   
+   If rst.EOF Then
+      Err.Raise vbObjectError + 600, , "Price is not associated with this price line."
+   End If
+   
    Set getPriceListEntry = returnPriceListEntry(rst)
    Set rst = Nothing
-   
+
 End Function
 
 
-
-Public Function createPriceListEntry(priceLineId As String) As dom_PriceListEntry
+Public Function createPriceListEntry() As dom_PriceListEntry
 ' Rerurn
 '  - a new PriceListEntry object if there is no or no future price list entry
 '  - the future PriceListEntry object for updates if there is one (you cannot
 '    create a new price object if there is already a coming price object )
 
    Dim rst  As ADODB.Recordset
-   Set rst = dba.getLatestPriceListEntry(priceLineId)
+   Set rst = dba.getLatestPriceListEntry(oPriceLineID)
    
 '  The first one in the recordset is the latest one (if not empty)
-   If rst.EOF Then  ' no prices yet
-      Set createPriceListEntry = createNewPriceListEntry(priceLineId)
-   ElseIf rst!ValidFrom < Date Then  ' current price, but no coming price
+   If rst.EOF Then  ' no prices yet (create a new)
+      Set createPriceListEntry = createNewPriceListEntry()
+   ElseIf rst!ValidFrom < Date Then  ' current price, but no coming price (create a new, copy current values)
       Set createPriceListEntry = clonePriceListEntry(rst)
-   Else  ' coming price
+   Else  ' coming price (open coming price, not new)
       Set createPriceListEntry = returnPriceListEntry(rst)
    End If
    
@@ -67,12 +75,13 @@ Public Function createPriceListEntry(priceLineId As String) As dom_PriceListEntr
 End Function
 
 
+
 Private Function returnPriceListEntry(rst As ADODB.Recordset) As dom_PriceListEntry
-' Construct a Pricelist Entry object from recordset
+' Construct an existing Pricelist Entry object from recordset
 
    Dim newPriceListEntry   As dom_PriceListEntry
-   Set newPriceListEntry = new_PriceListEntry(rst!PriceLine_Id, "STD")
-      
+   Set newPriceListEntry = new_PriceListEntry("STD")
+   
    With newPriceListEntry
       .setId (rst!id)
       .setPrice (rst!price)
@@ -94,15 +103,14 @@ Private Function returnPriceListEntry(rst As ADODB.Recordset) As dom_PriceListEn
 End Function
 
 
-Private Function createNewPriceListEntry(priceLineId As String) As dom_PriceListEntry
+Private Function createNewPriceListEntry() As dom_PriceListEntry
 ' Build a new PriceListEntry object
 
    Dim newPriceListEntry   As dom_PriceListEntry
-   Set newPriceListEntry = new_PriceListEntry(priceLineId, "STD")
+   Set newPriceListEntry = new_PriceListEntry("STD")
    
    With newPriceListEntry
       .setId (0)
-      .setPriceLineId (priceLineId)
       .setPrice (0)
       .setUnit ("€/kk")
       .setType ("RC")
@@ -123,13 +131,13 @@ End Function
 
 
 Private Function clonePriceListEntry(rst As ADODB.Recordset) As dom_PriceListEntry
-' Return a clone of given priceListEntry as a new (non-persistent) object
+' Return a clone of the given priceListEntry (rst) as a new (non-persistent) object
    
    Dim newPriceListEntry   As dom_PriceListEntry
-   Set newPriceListEntry = new_PriceListEntry(rst!PriceLine_Id, "STD")
-
+   Set newPriceListEntry = new_PriceListEntry("STD")
+   
    With newPriceListEntry
-'      .setId (rst!id); pitäisikö tämän olla .setId (0)
+      .setId (0)
       .setPrice (rst!price)
       .setUnit (rst!priceUnit)
       .setType (rst!priceType)
@@ -151,29 +159,12 @@ End Function
 
 Public Sub savePriceListEnrty(priceEntry As dom_PriceListEntry)
 ' Save price list entry data in database with use cases
-' - new price - no previous prices (insert new)
-' - new price - is current price (update current end data, insert new)
-' - edit future price (update current end date, update future price)
-' - edit current price (update (comment))
-' - edit old price (update (comment))
-
-   Dim currentPriceListEntry  As dom_PriceListEntry
+' - new price - no previous prices or future price
+' - edit current, future or old price
    
    If priceEntry.isNew Then
-      Set currentPriceListEntry = getCurrentPriceListEntry
-      If Not currentPriceListEntry Is Nothing Then   ' change end date of the current price
-         currentPriceListEntry.setValidTo (priceEntry.getValidFrom - 1)
-         Call dba.updatePriceListEntry(currentPriceListEntry)
-      End If
-      Call dba.insertPriceListEntry(priceEntry)
+      Call dba.insertPriceListEntry(priceEntry, oPriceLineID)
    Else
-      If priceEntry.getValidFrom >= Date Then
-         Set currentPriceListEntry = getCurrentPriceListEntry
-         If Not currentPriceListEntry Is Nothing Then
-            currentPriceListEntry.setValidTo (priceEntry.getValidFrom - 1)
-            Call dba.updatePriceListEntry(currentPriceListEntry)
-         End If
-      End If
       Call dba.updatePriceListEntry(priceEntry)
    End If
    
@@ -181,10 +172,12 @@ End Sub
 
 
 Private Function getCurrentPriceListEntry() As dom_PriceListEntry
+' Get price list entry data from database
+' - if there is no prices yet for this price line -> return empty rst
 
    Dim rst  As ADODB.Recordset
    
-   Set rst = dba.getCurrentPriceListEntry(oPriceLineCode)
+   Set rst = dba.getCurrentPriceListEntry(oPriceLineID)
    
    If rst.EOF Then
       Set getCurrentPriceListEntry = Nothing

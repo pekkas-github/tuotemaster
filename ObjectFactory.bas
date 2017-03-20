@@ -1,4 +1,4 @@
-Attribute VB_Name = "New_Object"
+Attribute VB_Name = "ObjectFactory"
 Option Compare Database
 Option Explicit
 ' This module has functions that simplifies initialization of new objects
@@ -140,9 +140,11 @@ End Function
 Public Function new_PriceLines(salesItemCode As String, salesItemVersion As String) As repo_PriceLines
 ' Create and return a new Priceline repository associated to the parent Sales Item.
 
-   Dim repo As New repo_PriceLines
+   Dim repo       As New repo_PriceLines
+   Dim versionID  As Long
    
-   repo.init salesItemCode, salesItemVersion
+   versionID = DLookup("Id", ITEM_VERSION, "Item_Code = '" & salesItemCode & "' AND VersionNumber = '" & salesItemVersion & "'")
+   repo.init versionID
    
    Set new_PriceLines = repo
    Set repo = Nothing
@@ -150,11 +152,12 @@ Public Function new_PriceLines(salesItemCode As String, salesItemVersion As Stri
 End Function
 
 
-Public Function new_PriceListEntry(priceLineCode As String, priceListID As String) As dom_PriceListEntry
+Public Function new_PriceListEntry(Optional priceListID As String = "STD") As dom_PriceListEntry
+' Create and return a new PriceListEntry object associated to its parent PriceLine and PriceList (default is STD)
 
    Dim newPrice   As New dom_PriceListEntry
    
-   Call newPrice.init(priceLineCode, priceListID)
+   newPrice.init priceListID
    
    Set new_PriceListEntry = newPrice
    Set newPrice = Nothing
@@ -300,30 +303,29 @@ Public Function new_Owner(personId As Long, startDate As Date) As dom_Owner
 End Function
 
 
-Public Function new_Owners_Self() As repo_Owners_Self
+Public Function new_Owners_Self(entityCode As String) As repo_Owners_Self
 ' Sinleton
 
-   Static statOwners  As repo_Owners_Self
+   Dim newOwners  As repo_Owners_Self
    
-   If statOwners Is Nothing Then
-      Set statOwners = New repo_Owners_Self
-   End If
+   Set newOwners = New repo_Owners_Self
+   newOwners.init entityCode
    
-   Set new_Owners_Self = statOwners
-
+   Set new_Owners_Self = newOwners
+   Set newOwners = Nothing
+   
 End Function
 
-Public Function new_Owners_Parent() As repo_Owners_Parent
-' Singleton
+Public Function new_Owners_Parent(entityCode As String) As repo_Owners_Parent
 
-   Static statOwners  As repo_Owners_Parent
+   Dim newOwners  As repo_Owners_Parent
    
-   If statOwners Is Nothing Then
-      Set statOwners = New repo_Owners_Parent
-   End If
+   Set newOwners = New repo_Owners_Parent
+   newOwners.init entityCode
    
-   Set new_Owners_Parent = statOwners
-
+   Set new_Owners_Parent = newOwners
+   Set newOwners = Nothing
+   
 End Function
 
 Public Function new_PriceLine() As dom_PriceLine
@@ -337,14 +339,21 @@ Public Function new_PriceLine() As dom_PriceLine
    
 End Function
 
-Public Function new_SalesItem(itemCode As String, itemVersion As String, namesBeh As If_Names, ownersBeh As If_Owners) As dom_SalesItem
+Public Function new_SalesItem(itemCode As String, itemVersion As String) As dom_SalesItem
 
-   Dim salesItem  As New dom_SalesItem
+   Dim salesItem           As New dom_SalesItem
+   Dim nameBehavior        As If_Names
+   Dim ownerBehavior       As If_Owners
    
-   salesItem.init itemCode, itemVersion, namesBeh, ownersBeh
+   Set nameBehavior = new_Names_Any(itemCode)
+   Set ownerBehavior = new_Owners_Parent(itemCode)
+   
+   salesItem.init itemCode, itemVersion, nameBehavior, ownerBehavior
    
    Set new_SalesItem = salesItem
    Set salesItem = Nothing
+   Set nameBehavior = Nothing
+   Set ownerBehavior = Nothing
    
 End Function
 Public Function new_Property(entityType As String, propertyType As String, valueId As String, isNew As Boolean) As dom_Property
@@ -369,14 +378,21 @@ Public Function new_Properties(entityCode As String, entityType As String) As re
    
 End Function
 
-Public Function new_Product(productCode As String, versionNro As String, namesBeh As If_Names, ownersBeh As If_Owners) As dom_Product
+Public Function new_Product(productCode As String, versionNro As String) As dom_Product
 
-   Dim newProduct As New dom_Product
+   Dim newProduct          As New dom_Product
+   Dim nameBehavior        As If_Names
+   Dim ownerBehavior       As If_Owners
+
+   Set nameBehavior = new_Names_Unique(productCode)
+   Set ownerBehavior = new_Owners_Self(productCode)
    
-   newProduct.init productCode, versionNro, namesBeh, ownersBeh
+   newProduct.init productCode, versionNro, nameBehavior, ownerBehavior
    
    Set new_Product = newProduct
    Set newProduct = Nothing
+   Set nameBehavior = Nothing
+   Set ownerBehavior = Nothing
    
 End Function
 
