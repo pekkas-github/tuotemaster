@@ -13,18 +13,22 @@ Option Explicit
 Private app          As Application_API
 Private Services     As Services
 Private dbConn       As ADODB.Connection
+Private oEntityCode  As String         ' Reference to the parent entity
+Private oVersionNro  As String         ' Reference to the version number of the parent entity
 
-Public Sub init()
+Public Sub init(entityCode As String, versionNro As String)
 
    Set app = new_Application_API
    Set Services = new_Services
    Set dbConn = CurrentProject.Connection
+   oEntityCode = entityCode
+   oVersionNro = versionNro
    
 End Sub
 
 
 
-Public Function getDescription(entityCode As String, versionNro As String, language As String) As dom_Description
+Public Function getDescription(language As String) As dom_Description
 
    Dim sql  As String
    Dim rst  As New ADODB.Recordset
@@ -32,14 +36,14 @@ Public Function getDescription(entityCode As String, versionNro As String, langu
    
    sql = "SELECT d.Description " & _
          "FROM " & VERSION_DESCRIPTION & " AS d INNER JOIN " & ITEM_VERSION & " AS v ON v.Id = d.ItemVersion_Id " & _
-         "WHERE v.Item_Code = '" & entityCode & "' AND v.VersionNumber = '" & versionNro & "' AND Lang_Code = '" & language & "'"
+         "WHERE v.Item_Code = '" & oEntityCode & "' AND v.VersionNumber = '" & oVersionNro & "' AND Lang_Code = '" & language & "'"
          
    rst.Open sql, dbConn, adOpenDynamic, adLockPessimistic
    
    If rst.EOF Then
       Set getDescription = Nothing
    Else
-      Set item = new_Description(entityCode, versionNro, language)
+      Set item = new_Description(language)
       item.setText (Nz(rst!description))
       Set getDescription = item
    End If
@@ -56,8 +60,8 @@ Public Sub saveDescription(newDescription As dom_Description)
    Dim versionID           As Long        ' this is utilized in insert and update subroutines
    
    With newDescription
-      Set currentDescription = getDescription(.getEntityCode, .getVersionNro, .getLanguage)
-      versionID = Services.getVersionId(.getEntityCode, .getVersionNro)
+      Set currentDescription = getDescription(oEntityCode, oVersionNro, .getLanguage)
+      versionID = Services.getVersionId(oEntityCode, oVersionNro)
    End With
    
    If currentDescription Is Nothing Then
@@ -108,14 +112,14 @@ Private Sub updateDescription(versionID As Long, currentDescription As dom_Descr
 End Sub
 
 
-Public Function rsString(entityCode As String, versionNro As String) As String
+Public Function rsString() As String
 ' Return rowsource statement to the user interface
 
    Dim sql  As String
    
    sql = "SELECT d.Description, d.Lang_Code " & _
          "FROM " & VERSION_DESCRIPTION & " AS d INNER JOIN " & ITEM_VERSION & " AS v ON v.Id = d.ItemVersion_Id " & _
-         "WHERE v.Item_Code = '" & entityCode & "' AND v.VersionNumber = '" & versionNro & "'"
+         "WHERE v.Item_Code = '" & oEntityCode & "' AND v.VersionNumber = '" & oVersionNro & "'"
    
    rsString = sql
      

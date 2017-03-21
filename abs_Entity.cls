@@ -35,7 +35,7 @@ Public Sub init(entityCode As String, versionNro As String)
    oType = util.getEntityType(entityCode)
    oVersionNro = versionNro
 
-   Set oDescriptions = new_Descriptions
+   Set oDescriptions = new_Descriptions(entityCode, versionNro)
    Set oStatuses = new_Statuses
    Set oDecisions = new_Decisions
    Set oProperties = new_Properties(oCode, oType)
@@ -69,7 +69,7 @@ Public Function getDescription(language As String) As String
 
    Dim description   As dom_Description
 
-   Set description = oDescriptions.getDescription(oCode, oVersionNro, language)
+   Set description = oDescriptions.getDescription(language)
    
    If description Is Nothing Then
       getDescription = ""

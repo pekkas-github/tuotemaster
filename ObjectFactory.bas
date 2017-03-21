@@ -211,11 +211,11 @@ Public Function new_Decisions() As repo_Decisions
 End Function
 
 
-Public Function new_Description(entityCode As String, versionNro As String, language As String) As dom_Description
+Public Function new_Description(language As String) As dom_Description
 
    Dim newDescription As New dom_Description
    
-   Call newDescription.init(entityCode, versionNro, language)
+   Call newDescription.init(language)
    Set new_Description = newDescription
    
    Set newDescription = Nothing
@@ -223,11 +223,11 @@ Public Function new_Description(entityCode As String, versionNro As String, lang
 End Function
 
 
-Public Function new_Descriptions() As repo_Descriptions
+Public Function new_Descriptions(entityCode As String, versionNro As String) As repo_Descriptions
 
    Dim newDescriptions  As New repo_Descriptions
    
-   Call newDescriptions.init
+   newDescriptions.init entityCode, versionNro
    Set new_Descriptions = newDescriptions
    
    Set newDescriptions = Nothing

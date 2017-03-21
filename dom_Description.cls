@@ -14,15 +14,11 @@ Option Explicit
 
 Private oDescriptionText   As String
 Private oLanguage          As String
-Private oEntityCode        As String
-Private oVersionNro        As String
 
 
 'constructor
-Public Sub init(entityCode As String, versionNro As String, language As String)
+Public Sub init(language As String)
 
-   oEntityCode = entityCode
-   oVersionNro = versionNro
    oLanguage = language
    
 End Sub
@@ -39,19 +35,6 @@ Public Sub setText(value As String)
    
 End Sub
 
-
-Public Function getEntityCode() As String
-   
-   getEntityCode = oEntityCode
-   
-End Function
-
-
-Public Function getVersionNro() As String
-
-   getVersionNro = oVersionNro
-   
-End Function
 Public Function getLanguage() As String
 
    getLanguage = oLanguage
