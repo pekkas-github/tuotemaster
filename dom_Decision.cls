@@ -14,7 +14,6 @@ Option Explicit
 
 Private oId          As Long
 Private oStartDate   As Date
-Private oEndDate     As Date
 Private oText        As String
 Private oAuthority   As String
 Private oNew         As Boolean
@@ -28,7 +27,6 @@ Public Sub init(isNew As Boolean)
    If isNew Then
       oId = 0
       oStartDate = Date
-      oEndDate = "31.12.2050"
       oText = "Decision text..."
       oAuthority = "Admin"
    End If

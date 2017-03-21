@@ -15,62 +15,78 @@ Option Explicit
 ' It creates new Decision objects, fetches existing Decisiond data
 ' and stores new and modified dDecision data.
 
-' CREATED in HOT#005
-
 Private app                As Application_API
 Private Services           As Services
 Private dbConn             As ADODB.Connection
+private oEntityCode		   as string		' Reference to the parent entity
+private oVersionNro		   as string         ' Reference to the version of the parent entity
 
 
-Public Sub init()
+Public Sub init(entityCode as string, versionNro as string)
 
    Set app = New Application_API
    Set Services = New Services
    Set dbConn = CurrentProject.Connection
+   oentitycode = entitycode
+   oversionnro = versionnro
    
 End Sub
 
 
 Public Function createDecision() As dom_Decision
+' Create a new decision if
+'  - there are no decisions yet or
+'  - startDate of the last decision is passed
+' Edit last decision if
+'  - startDate of the last decision is today
+'TODO: toteutus on kesken. Katso mallia repo_PriceListEntries
 
-   Set createDecision = new_Decision(True)
-   
+	dim rst	as ADODB.Recordset
+	set rst = dba_Decisions.getLastDecision(oentitycode, oversionnro) ' TODO: tässä hae dba_Decisions:sta rst
+
+	if not rst.EOF AND rst!ValidFrom = Date then
+   		set createDecision = returnDecision(rst)
+	else	
+   		Set createDecision = new_Decision(True)
+   	end if	
+   	
 End Function
 
 
 Public Function getDecision(decisionId As Long) As dom_Decision
 ' Return decision object requested by decision id.
-
+' TODO: siirrä sql-kysely dba_Decisions:iin
 
    Dim sql           As String
    Dim rst           As New ADODB.Recordset
-   Dim dec           As dom_Decision
+   Dim decision      As dom_Decision
    
-   sql = "SELECT Authority, DecisionText, ValidFrom, ValidTo " & _
+   sql = "SELECT Authority, DecisionText, ValidFrom " & _
          "FROM " & VERSION_DECISION & _
          " WHERE Id = " & decisionId
          
    rst.Open sql, dbConn, adOpenDynamic, adLockPessimistic
    
-   Set dec = new_Decision(False)
+   Set decision = new_Decision(False)
    
-   With rst
-      dec.setId (decisionId)
-      dec.setAuthority (Nz(!authority))
-      dec.setDecisionText (Nz(!decisionText))
-      dec.setStartDate (!ValidFrom)
-      dec.setEndDate (!ValidTo)
+   With decision
+      .setId (decisionId)
+      .setAuthority (Nz(rst!authority))
+      .setDecisionText (Nz(rst!decisionText))
+      .setStartDate (rst!ValidFrom)
    End With
    
-   Set getDecision = dec
+   Set getDecision = decision
    
    Set rst = Nothing
-   Set dec = Nothing
+   Set decision = Nothing
    
 End Function
 
 
-Public Function getLastDecision(entityCode As String, versionNro As String) As dom_Decision
+Public Function getLastDecision() As dom_Decision
+'TODO: tee dba_Decisions ja siirrä tämä sinne.
+
 ' Return data record of the last decision of this entity version
 ' If there is no last decision return nothing
    
@@ -81,7 +97,7 @@ Public Function getLastDecision(entityCode As String, versionNro As String) As d
    sql = "SELECT d.Id, d.Authority, d.DecisionText, d.ValidFrom, d.ValidTo " & _
          "FROM " & VERSION_DECISION & " AS d " & _
          "INNER JOIN " & ITEM_VERSION & " AS v ON v.Id = d.ItemVersion_Id " & _
-         "WHERE v.Item_Code =  '" & entityCode & "' AND v.VersionNumber = '" & versionNro & "' " & _
+         "WHERE v.Item_Code =  '" & oentityCode & "' AND v.VersionNumber = '" & oversionNro & "' " & _
          "AND ValidFrom <= " & TODAY & " AND " & TODAY & " < ValidTo"
    
    rst.Open sql, dbConn, adOpenDynamic, adLockPessimistic
@@ -95,7 +111,6 @@ Public Function getLastDecision(entityCode As String, versionNro As String) As d
          lastDecision.setAuthority (Nz(!authority))
          lastDecision.setDecisionText (Nz(!decisionText))
          lastDecision.setStartDate (!ValidFrom)
-         lastDecision.setEndDate (!ValidTo)
       End If
    End With
    
@@ -109,6 +124,8 @@ End Function
 
 Public Sub saveDecision(entityCode As String, versionNro As String, newDecision As dom_Decision)
 ' Insert or update decision data and change the end date of the latest decision
+' TODO: Tämä pelkistyy huomattavasti, kun päiväyksien kanssa ei enää
+' temppuilla. Jos on uusi, talletetaan, jos ei, päivitetään.
 
    Dim lastDecision  As dom_Decision
    Dim versionID     As Long
