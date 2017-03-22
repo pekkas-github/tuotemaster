@@ -107,7 +107,7 @@ Public Function getLatestPriceListEntry(priceLineCode As String) As ADODB.Record
     Set rst = Nothing
 
 End Function
-Public Sub insertPriceLine(newPriceLine As dom_PriceLine, versionID As Long)
+Public Sub insertPriceLine(newPriceLine As dom_PriceLine, versionId As Long)
     
     Dim rst As New ADODB.Recordset
     
@@ -117,7 +117,7 @@ Public Sub insertPriceLine(newPriceLine As dom_PriceLine, versionID As Long)
 '     Add new price line
       rst.AddNew
       rst!id = .getCode
-      rst!ItemVersion_Id = versionID
+      rst!ItemVersion_Id = versionId
       rst!BizTypeBasic_Id = .getBusinessTypeBasic
       rst!BizTypeOverride_Id = .getBusinessTypeOverride
       rst!sapCode = .getSapCode

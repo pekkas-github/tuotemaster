@@ -62,9 +62,9 @@ Public Function createPriceListEntry() As dom_PriceListEntry
    Set rst = dba.getLatestPriceListEntry(oPriceLineID)
    
 '  The first one in the recordset is the latest one (if not empty)
-   If rst.EOF Then  ' no prices yet (create a new)
+   If rst.EOF Then   ' no prices yet (create a new)
       Set createPriceListEntry = createNewPriceListEntry()
-   ElseIf rst!ValidFrom < Date Then  ' current price, but no coming price (create a new, copy current values)
+   ElseIf rst!ValidFrom < Date Then    ' current price, but no coming price (create a new, copy current values)
       Set createPriceListEntry = clonePriceListEntry(rst)
    Else  ' coming price (open coming price, not new)
       Set createPriceListEntry = returnPriceListEntry(rst)

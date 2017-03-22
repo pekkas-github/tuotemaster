@@ -11,16 +11,12 @@ Option Compare Database
 Option Explicit
 
 Private app          As Application_API
-Private Services     As Services
-Private dbConn       As ADODB.Connection
 Private oEntityCode  As String         ' Reference to the parent entity
 Private oVersionNro  As String         ' Reference to the version number of the parent entity
 
 Public Sub init(entityCode As String, versionNro As String)
 
    Set app = new_Application_API
-   Set Services = new_Services
-   Set dbConn = CurrentProject.Connection
    oEntityCode = entityCode
    oVersionNro = versionNro
    
@@ -38,7 +34,7 @@ Public Function getDescription(language As String) As dom_Description
          "FROM " & VERSION_DESCRIPTION & " AS d INNER JOIN " & ITEM_VERSION & " AS v ON v.Id = d.ItemVersion_Id " & _
          "WHERE v.Item_Code = '" & oEntityCode & "' AND v.VersionNumber = '" & oVersionNro & "' AND Lang_Code = '" & language & "'"
          
-   rst.Open sql, dbConn, adOpenDynamic, adLockPessimistic
+   rst.Open sql, app.getDbConn, adOpenDynamic, adLockPessimistic
    
    If rst.EOF Then
       Set getDescription = Nothing
@@ -57,18 +53,18 @@ Public Sub saveDescription(newDescription As dom_Description)
 ' Create a new description record or update an existing one
 
    Dim currentDescription  As dom_Description
-   Dim versionID           As Long        ' this is utilized in insert and update subroutines
+   Dim versionId           As Long        ' this is utilized in insert and update subroutines
    
    With newDescription
-      Set currentDescription = getDescription(oEntityCode, oVersionNro, .getLanguage)
-      versionID = Services.getVersionId(oEntityCode, oVersionNro)
+      Set currentDescription = getDescription(.getLanguage)
+      versionId = app.Services.getVersionId(oEntityCode, oVersionNro)
    End With
    
    If currentDescription Is Nothing Then
-      Call insertDescription(versionID, newDescription)
+      Call insertDescription(versionId, newDescription)
    Else
       currentDescription.setText (newDescription.getText)
-      Call updateDescription(versionID, currentDescription)
+      Call updateDescription(versionId, currentDescription)
    End If
    
    Set currentDescription = Nothing
@@ -76,16 +72,16 @@ Public Sub saveDescription(newDescription As dom_Description)
 End Sub
 
 
-Private Sub insertDescription(versionID As Long, newDescription As dom_Description)
+Private Sub insertDescription(versionId As Long, newDescription As dom_Description)
 
    Dim rst        As New ADODB.Recordset
    
-   rst.Open VERSION_DESCRIPTION, dbConn, adOpenDynamic, adLockPessimistic
+   rst.Open VERSION_DESCRIPTION, app.getDbConn, adOpenDynamic, adLockPessimistic
 
    rst.AddNew
    rst!description = newDescription.getText
    rst!Lang_Code = newDescription.getLanguage
-   rst!ItemVersion_Id = versionID
+   rst!ItemVersion_Id = versionId
    rst.Update
    
    Set rst = Nothing
@@ -93,16 +89,16 @@ Private Sub insertDescription(versionID As Long, newDescription As dom_Descripti
 End Sub
 
 
-Private Sub updateDescription(versionID As Long, currentDescription As dom_Description)
+Private Sub updateDescription(versionId As Long, currentDescription As dom_Description)
 
    Dim sql        As String
    Dim rst        As New ADODB.Recordset
       
    sql = "SELECT * FROM " & VERSION_DESCRIPTION & _
-         " WHERE ItemVersion_Id = " & versionID & _
+         " WHERE ItemVersion_Id = " & versionId & _
          " AND Lang_Code = '" & currentDescription.getLanguage & "'"
          
-   rst.Open sql, dbConn, adOpenDynamic, adLockPessimistic
+   rst.Open sql, app.getDbConn, adOpenDynamic, adLockPessimistic
 
    rst!description = currentDescription.getText
    rst.Update
@@ -129,7 +125,5 @@ End Function
 Private Sub Class_Terminate()
    
    Set app = Nothing
-   Set Services = Nothing
-   Set dbConn = Nothing
    
 End Sub

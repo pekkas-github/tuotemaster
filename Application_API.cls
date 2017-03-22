@@ -40,3 +40,9 @@ Public Function Statuses() As repo_Statuses
    Set Statuses = new_Statuses
    
 End Function
+
+Public Function Services() As Services
+
+   Set Services = new_Services
+   
+End Function

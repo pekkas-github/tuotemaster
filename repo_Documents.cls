@@ -86,16 +86,16 @@ End Function
 Public Sub saveDocReference(docRef As dom_Document)
 
    Dim app        As Application_API
-   Dim versionID  As Long
+   Dim versionId  As Long
    
    Set app = new_Application_API
    
-   versionID = util.getVersionId(parentCode, versionNro)
+   versionId = util.getVersionId(parentCode, versionNro)
    
    If docRef.isPersistent Then
       Call db.updateDocReference(docRef)
    Else
-      docRef.setId (db.insertDocReference(versionID, docRef))
+      docRef.setId (db.insertDocReference(versionId, docRef))
    End If
    
    Set app = Nothing

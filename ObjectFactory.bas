@@ -66,6 +66,12 @@ Public Function new_Dba_Documents() As Dba_Documents
 End Function
 
 
+Public Function new_Dba_Decisions() As dba_Decisions
+
+   Set new_Dba_Decisions = New dba_Decisions
+   
+End Function
+
 Public Function new_Dba_BillingMapper() As Dba_BillingMapper
    
    Set new_Dba_BillingMapper = New Dba_BillingMapper
@@ -141,10 +147,10 @@ Public Function new_PriceLines(salesItemCode As String, salesItemVersion As Stri
 ' Create and return a new Priceline repository associated to the parent Sales Item.
 
    Dim repo       As New repo_PriceLines
-   Dim versionID  As Long
+   Dim versionId  As Long
    
-   versionID = DLookup("Id", ITEM_VERSION, "Item_Code = '" & salesItemCode & "' AND VersionNumber = '" & salesItemVersion & "'")
-   repo.init versionID
+   versionId = DLookup("Id", ITEM_VERSION, "Item_Code = '" & salesItemCode & "' AND VersionNumber = '" & salesItemVersion & "'")
+   repo.init versionId
    
    Set new_PriceLines = repo
    Set repo = Nothing
@@ -199,11 +205,11 @@ Public Function new_Decision(isNew As Boolean) As dom_Decision
    
 End Function
 
-Public Function new_Decisions() As repo_Decisions
+Public Function new_Decisions(entityCode As String, versionNro As String) As repo_Decisions
    
    Dim newDecisions  As New repo_Decisions
    
-   Call newDecisions.init
+   newDecisions.init entityCode, versionNro
    Set new_Decisions = newDecisions
    
    Set newDecisions = Nothing

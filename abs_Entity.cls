@@ -16,7 +16,6 @@ Option Explicit
 ' These calls are of form Entity.Documents.getDocument(docId).
   
 Private app             As Application_API
-Private util            As Services
 Private oDescriptions   As repo_Descriptions
 Private oStatuses       As repo_Statuses
 Private oDecisions      As repo_Decisions
@@ -30,15 +29,14 @@ Private oNew            As Boolean
 Public Sub init(entityCode As String, versionNro As String)
    
    Set app = new_Application_API
-   Set util = new_Services
    oCode = entityCode
-   oType = util.getEntityType(entityCode)
+   oType = app.Services.getEntityType(entityCode)
    oVersionNro = versionNro
 
    Set oDescriptions = new_Descriptions(entityCode, versionNro)
    Set oStatuses = new_Statuses
-   Set oDecisions = new_Decisions
-   Set oProperties = new_Properties(oCode, oType)
+   Set oDecisions = new_Decisions(entityCode, versionNro)
+   Set oProperties = new_Properties(entityCode, oType)
       
 End Sub
 
@@ -124,7 +122,7 @@ Public Sub setDescription(newText As String, language As String)
 
    Dim newDescription   As dom_Description
    
-   Set newDescription = new_Description(oCode, oVersionNro, language)
+   Set newDescription = new_Description(language)
    newDescription.setText (Nz(newText))
    
    Call oDescriptions.saveDescription(newDescription)
@@ -170,7 +168,6 @@ End Property
 Private Sub Class_Terminate()
 
    Set app = Nothing
-   Set util = Nothing
    Set oProperties = Nothing
    Set oDecisions = Nothing
    Set oDescriptions = Nothing

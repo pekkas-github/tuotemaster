@@ -33,10 +33,6 @@ Public Sub init(isNew As Boolean)
          
 End Sub
 
-Public Sub setStartDate(value As Date)
-   oStartDate = value
-End Sub
-
 Public Function getDecisionText() As String
    getDecisionText = oText
 End Function
@@ -57,12 +53,8 @@ Public Function getStartDate() As Date
    getStartDate = oStartDate
 End Function
 
-Public Function getEndDate() As Date
-   getEndDate = oEndDate
-End Function
-
-Public Sub setEndDate(value As Date)
-   oEndDate = value
+Public Sub setStartDate(value As Date)
+   oStartDate = value
 End Sub
 
 Public Function getId() As Long
