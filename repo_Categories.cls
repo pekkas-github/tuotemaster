@@ -17,14 +17,12 @@ Option Explicit
 
 Private app          As Application_API
 Private super        As abs_Entities
-Private util         As Services
 
 
 Private Sub Class_Initialize()
 
    Set super = New abs_Entities
    Set app = new_Application_API
-   Set util = new_Services
    
 End Sub
 
@@ -32,7 +30,6 @@ Private Sub Class_Terminate()
 
    Set app = Nothing
    Set super = Nothing
-   Set util = Nothing
    
 End Sub
 
@@ -47,13 +44,12 @@ Public Function createCategory(categoryType As String, parentCode As String) As 
 
    Dim newCategory         As dom_Category
    Dim parentCategory      As dom_Category
-   Dim mapper              As GroupMapper
    Dim nameBehavior        As If_Names
    Dim ownerBehavior       As If_Owners
    Dim categoryCode        As String
    
 '  Find next available category / group code; it's needed in next actions
-   categoryCode = util.getNextEntityCode(categoryType)
+   categoryCode = app.Services.getNextEntityCode(categoryType)
 
 '  Define name and owner behavior specific for category/group entities
    If categoryType = "CAT" Then
@@ -71,9 +67,9 @@ Public Function createCategory(categoryType As String, parentCode As String) As 
    super.createVersion categoryCode, "1.0"
 
 '  Add the new category in its parent
-   Set mapper = New GroupMapper
    Set parentCategory = getCategory(parentCode)
-   mapper.map newCategory.getCode, newCategory.getType, parentCategory.getCode, parentCategory.getType
+   
+   app.getGroupMapper.map newCategory.getCode, newCategory.getType, parentCategory.getCode, parentCategory.getType
 
    Set createCategory = newCategory
    
@@ -81,7 +77,6 @@ Public Function createCategory(categoryType As String, parentCode As String) As 
    Set parentCategory = Nothing
    Set nameBehavior = Nothing
    Set ownerBehavior = Nothing
-   Set mapper = Nothing
    
 End Function
 
