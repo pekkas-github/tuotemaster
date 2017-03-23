@@ -14,7 +14,6 @@ Option Explicit
 ' documents
 
 Private db           As Dba_Documents
-Private util         As Services
 Private parentCode   As String      ' Reference to the parent entity
 Private versionNro   As String      ' Reference to the version number of the parent entity
 
@@ -22,7 +21,6 @@ Private versionNro   As String      ' Reference to the version number of the par
 Public Sub init(pCode As String, pVer As String)
    
    Set db = new_Dba_Documents
-   Set util = new_Services
    parentCode = pCode
    versionNro = pVer
    
@@ -31,7 +29,6 @@ End Sub
 Private Sub Class_Terminate()
 
    Set db = Nothing
-   Set util = Nothing
    
 End Sub
 
@@ -46,7 +43,7 @@ Public Function getDocReference(docId As Long) As dom_Document
    Set docRst = db.getDocument(docId)
    Set docRef = new_Document
    
-   If docRst.EOF Then Err.Raise recordnotfound, , "Document reference not found"
+   If docRst.EOF Then Err.Raise e.recordnotfound, , "Document reference not found"
    
    With docRst
         docRef.setId (docId)
@@ -90,7 +87,7 @@ Public Sub saveDocReference(docRef As dom_Document)
    
    Set app = new_Application_API
    
-   versionId = util.getVersionId(parentCode, versionNro)
+   versionId = app.Services.getVersionId(parentCode, versionNro)
    
    If docRef.isPersistent Then
       Call db.updateDocReference(docRef)
