@@ -35,7 +35,7 @@ End Sub
 
 '---- METHODS ---------------------
 
-Private Function getOwner() As dom_Owner
+Public Function getOwner() As dom_Owner
 ' Return the current owner of the entity.
 
    Dim rst  As ADODB.Recordset
@@ -58,7 +58,7 @@ Private Sub saveOwner(newOwner As dom_Owner)
 
    Dim currentOwner  As dom_Owner
    
-   Set currentOwner = getOwner(oEntityCode)
+   Set currentOwner = getOwner()
    
    If currentOwner Is Nothing Then
 '     no previous owners

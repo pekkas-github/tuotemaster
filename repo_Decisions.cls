@@ -43,6 +43,7 @@ Public Function createDecision() As dom_Decision
    Dim newDecision   As dom_Decision
    Set rst = dba.getLastDecision(oEntityCode, oVersionNro)
 
+   'TODO: jos rst.EOF on true, niin silloin rst!ValidFrom antaa virheen!
    If Not rst.EOF And rst!ValidFrom = Date Then ' Last decision starting today (-> edit current decision)
       Set newDecision = new_Decision(False)     ' Mark decision "not new"
       With newDecision

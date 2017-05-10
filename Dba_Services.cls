@@ -6,7 +6,7 @@ Attribute VB_Name = "Dba_Services"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
-Attribute VB_Exposed = False
+Attribute VB_Exposed = True
 Option Compare Database
 Option Explicit
 
@@ -32,7 +32,7 @@ End Function
 
 Public Function getEntityType(entityCode As String) As String
 
-   getEntityType = DLookup("Type", CORE_ITEM, "[Code] = '" & entityCode & "'")
+   getEntityType = Nz(DLookup("Type", CORE_ITEM, "[Code] = '" & entityCode & "'"))
 
 End Function
 
@@ -114,7 +114,7 @@ Public Sub deleteNames(entityCode As String)
    rst.Open sql, app.getDbConn, adOpenDynamic, adLockPessimistic
    
    While Not rst.EOF
-      rst.Delete
+      rst.delete
       rst.Update
       rst.MoveNext
    Wend
@@ -133,7 +133,7 @@ Public Sub deleteOwners(entityCode As String)
    rst.Open sql, app.getDbConn, adOpenDynamic, adLockPessimistic
    
    While Not rst.EOF
-      rst.Delete
+      rst.delete
       rst.Update
       rst.MoveNext
    Wend
@@ -152,7 +152,7 @@ Public Sub deleteDescriptions(verId As Long)
    rst.Open sql, app.getDbConn, adOpenDynamic, adLockPessimistic
    
    While Not rst.EOF
-      rst.Delete
+      rst.delete
       rst.Update
       rst.MoveNext
    Wend
@@ -171,7 +171,7 @@ Public Sub deleteStatuses(verId As Long)
    rst.Open sql, app.getDbConn, adOpenDynamic, adLockPessimistic
    
    While Not rst.EOF
-      rst.Delete
+      rst.delete
       rst.Update
       rst.MoveNext
    Wend
@@ -190,7 +190,7 @@ Public Sub deleteDecisions(verId As Long)
    rst.Open sql, app.getDbConn, adOpenDynamic, adLockPessimistic
    
    While Not rst.EOF
-      rst.Delete
+      rst.delete
       rst.Update
       rst.MoveNext
    Wend
@@ -209,7 +209,7 @@ Public Sub deleteVersion(verId As Long)
    rst.Open sql, app.getDbConn, adOpenDynamic, adLockPessimistic
    
    While Not rst.EOF
-      rst.Delete
+      rst.delete
       rst.Update
       rst.MoveNext
    Wend
@@ -228,7 +228,7 @@ Public Sub deleteProperties(entityCode As String)
    rst.Open sql, app.getDbConn, adOpenDynamic, adLockPessimistic
    
    While Not rst.EOF
-      rst.Delete
+      rst.delete
       rst.Update
       rst.MoveNext
    Wend
@@ -247,7 +247,7 @@ Public Sub deleteEntity(entityCode As String)
    rst.Open sql, app.getDbConn, adOpenDynamic, adLockPessimistic
    
    While Not rst.EOF
-      rst.Delete
+      rst.delete
       rst.Update
       rst.MoveNext
    Wend

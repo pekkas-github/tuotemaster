@@ -72,7 +72,7 @@ End Function
 
 Public Function getOwner() As dom_Owner
 
-   Set getOwner = oOwners.getOwner(super.getCode)
+   Set getOwner = oOwners.getOwner
    
 End Function
 

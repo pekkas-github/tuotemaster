@@ -109,7 +109,7 @@ Public Sub save(newCategory As dom_Category)
 ' Save category and version in database.
 
    Dim db   As New dba_Categories
-   
+   Set db = New dba_Categories
    db.saveCategory newCategory
    
    Set db = Nothing

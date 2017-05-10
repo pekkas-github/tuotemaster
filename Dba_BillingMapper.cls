@@ -6,7 +6,7 @@ Attribute VB_Name = "Dba_BillingMapper"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
-Attribute VB_Exposed = False
+Attribute VB_Exposed = True
 Option Compare Database
 Option Explicit
 
@@ -52,7 +52,7 @@ Public Sub deleteMapping(system As String, code As String)
       .Open sql, app.getDbConn, adOpenDynamic, adLockPessimistic
       
       While Not .EOF
-         .Delete
+         .delete
          .Update
          .MoveNext
       Wend

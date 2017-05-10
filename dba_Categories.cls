@@ -12,7 +12,7 @@ Option Explicit
 
 Private app    As Application_API
 
-Private Sub Class_Initilize()
+Private Sub Class_Initialize()
 
    Set app = new_Application_API
    

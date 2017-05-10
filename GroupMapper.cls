@@ -15,16 +15,19 @@ Option Explicit
 ' Orphan subgroups will be cleaned by garbage collection.
 
 '---- ATTRIBUTES ------------------------------
-Private db                      As Dba_GroupMapper
-Private cutPending              As Boolean
+Private clipBoard() As Variant
+Private app          As Application_API
+Private db           As Dba_GroupMapper
+Private cutPending   As Boolean
 
 
 '---- INIT AND TERMINATE --------------------
 Private Sub Class_Initialize()
     
-    Set db = New Dba_GroupMapper
+   Set app = New Application_API
+   Set db = New Dba_GroupMapper
 
-    cutPending = False
+   cutPending = False
     
 End Sub
 
@@ -33,66 +36,91 @@ Private Sub Class_Terminate()
 
    db.deleteOrphanGroups
    Set db = Nothing
+   Set app = Nothing
    
 End Sub
 
 '---- METHODS -------------------------------
 
 
-Public Sub cut(parentCode As String, childCodes As Collection)
-' Cut all child groups selected in the collection from their parent.
+Public Sub cut(selectedItems As Variant)
+' Store all selected child groups to be potentially cut from their parent.
+' Item list includes childCode, childType and parentCode of the selected items
 ' Parent may be ROOT, CAT or GRP.
-' Collection remains on clipboard until next cut, copy or garbage collection takes place.
+            
+   clipBoard = selectedItems
+            
+   cutPending = True
+        
+End Sub
 
-    Dim childCode As Variant
+
+
+Public Sub copy(selectedItems As Variant)
+' Copy all child groups selected on the clipboard.
+' Clipboard contents remain until next cut, copy or garbage collection takes place.
     
-    cutPending = True
-    Set Globals.clipBoard = childCodes
-    
-    For Each childCode In childCodes
-        Call unMap(CStr(childCode), parentCode)
-    Next
+   clipBoard = selectedItems
+   
+   cutPending = False
             
 End Sub
 
 
 Public Sub paste(parentCode As String, parentType As String, parentSubType As String)
-' Paste the previously copied/cut child collection to this parent
-' Before pasting check that it is allowed for child type and parent sub type match.
-' Cut (or copied) collection remains on clipboard.
+' Paste the previously copied/cut children on clipboard to this parent
+' Before pasting check that it is allowed  child type - parent sub type match.
+' Cut items are erased from clipboard after paste. Copied items remain on clipboard.
 
-    Dim childCode       As Variant
-    Dim childType       As String
-    Dim util            As Services
+   On Error GoTo catch
     
-    Set util = new_Services
-    
-    For Each childCode In Globals.clipBoard
-        childType = util.getEntityType(CStr(childCode))
-        If parentSubType = childType Then
-            Call map(CStr(childCode), childType, parentCode, parentType)
-        Else
-            Err.Raise vbObjectError + 513, , "Parent and child items are incompatible."
-        End If
-    Next
-        
-    cutPending = False
-    
+   Dim parentSubMemberType As String
+   Dim i                   As Integer
+   Dim childCode           As String
+   Dim childType           As String
+   Dim oldParent           As String
+      
+'  Get parent group's allowed subgroup type
+   parentSubMemberType = app.getCategories.getCategory(parentCode).getProperty("SUB_MEM").getValue
+
+'  Check that attaching is allowed
+   If parentSubMemberType <> clipBoard(i, 1) Then
+      Err.Raise vbObjectError + 513, , "Parent and child items are incompatible."
+   End If
+
+   For i = 0 To UBound(clipBoard)
+      childCode = CStr(clipBoard(i, 0))
+      childType = CStr(clipBoard(i, 1))
+      oldParent = CStr(clipBoard(i, 2))
+      If cutPending Then
+'        Remove group from current parernt
+         unMap childCode, oldParent
+      End If
+'     Attach group to new parent
+      map childCode, childType, parentCode, parentType
+   Next i
+           
+   If cutPending Then Erase clipBoard
+   cutPending = False
+   Exit Sub
+   
+catch:
+   If Err.number = 9 Then
+      Err.Raise 9, , "There is nothing to paste."
+   Else
+      Err.Raise Err.number
+   End If
+   
 End Sub
 
 
-Public Sub copy(childCodes As Collection)
-' Copy all child groups selected in the collection.
-' Collection remains on clipboard until next cut, copy or garbage collection takes place.
+Public Sub delete(childCode As String, parentCode As String)
+'Removes permanenttly the child group from it's parent. Garbage collection removes
+'permanently the rest of the detached branch.
 
-    
-    Set Globals.clipBoard = childCodes
-    
-    cutPending = False
-            
+   unMap childCode, parentCode
+   
 End Sub
-
-
 Public Sub unMap(childCode As String, parentCode As String)
 '   Disconnect this child entity from its parent entity
 
@@ -112,8 +140,6 @@ Public Sub map(childCode As String, childType As String, parentCode As String, p
     Call db.insertInGroupHierarchy(childCode, childType, parentCode, parentType)
         
 End Sub
-
-
 
 
 Public Function isCutPending() As Boolean

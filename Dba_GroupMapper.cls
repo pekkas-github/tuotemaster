@@ -6,18 +6,16 @@ Attribute VB_Name = "Dba_GroupMapper"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
-Attribute VB_Exposed = False
+Attribute VB_Exposed = True
 Option Compare Database
 Option Explicit
 
 Private app    As Application_API
-Private util   As Services
 
 
 Private Sub Class_Initialize()
    
    Set app = new_Application_API
-   Set util = new_Services
    
 End Sub
 
@@ -117,7 +115,7 @@ Public Sub deleteFromGroupHierarchy(childCode As String, parentCode As String)
           " WHERE Child_Code = '" & childCode & "' AND Parent_Code = '" & parentCode & "'"
           
     rst.Open sql, app.getDbConn, , adLockPessimistic
-    rst.Delete
+    rst.delete
     rst.Update
 
     Set rst = Nothing
@@ -138,7 +136,7 @@ Public Sub deleteFromGroupHierarchy_old(childEntity As Object, parentEntity As O
           " WHERE Child_Code = '" & childEntity.getCode & "' AND Parent_Code = '" & parentEntity.getCode & "'"
           
     rst.Open sql, app.getDbConn, , adLockPessimistic
-    rst.Delete
+    rst.delete
     rst.Update
 
     Set rst = Nothing
@@ -159,21 +157,21 @@ Public Sub deleteOrphanGroups()
          "FROM " & GROUP_HIERARCHY & " AS g1 " & _
          "LEFT JOIN " & GROUP_HIERARCHY & " AS g2 ON g1.Parent_Code = g2.Child_Code " & _
          "WHERE g2.Child_Code Is Null AND g1.Parent_Code <> 'ROOT' AND g1.Parent_Code <> 'PROD'"
-   
+
+'  Find and delete orphans repeatly until all orphans are removed from hierarchies.
    Do
       Set rst = New ADODB.Recordset
       rst.Open sql, app.getDbConn, adOpenDynamic, adLockPessimistic
       While Not rst.EOF
-         rst.Delete
+         rst.delete
          rst.Update
          rst.MoveNext
       Wend
    Loop Until rst.BOF
 
    rst.Close
-'TODO: poistetaan myös entiteetti ja sen attribuutit (löytyy Item-taulusta, mutta ei löydy
-'      GroupHierarchy-taulun childeista. Koskee jälleen vain CAT ja GRP tyyppejä.
 
+'  Delete permanently all group entities that doesn't exist in any hierarchy any more
    sql = "SELECT i.* " & _
          "FROM " & CORE_ITEM & " AS i " & _
          "LEFT JOIN " & GROUP_HIERARCHY & " AS g ON i.Code = g.Child_Code " & _
@@ -182,7 +180,7 @@ Public Sub deleteOrphanGroups()
    rst.Open sql, app.getDbConn, adOpenDynamic, adLockPessimistic
    
    While Not rst.EOF
-      Call util.deleteEntityPermanently(rst!code)
+      Call app.Services.deleteEntityPermanently(rst!code)
       rst.MoveNext
    Wend
    
@@ -192,6 +190,5 @@ End Sub
 Private Sub Class_Terminate()
 
    Set app = Nothing
-   Set util = Nothing
    
 End Sub
