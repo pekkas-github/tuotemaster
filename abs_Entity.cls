@@ -26,11 +26,11 @@ Private oVersionNro     As String
 Private oNew            As Boolean
 
 
-Public Sub init(entityCode As String, versionNro As String)
+Public Sub init(entityCode As String, entityType As String, versionNro As String)
    
    Set app = new_Application_API
    oCode = entityCode
-   oType = app.Services.getEntityType(entityCode)
+   oType = entityType
    oVersionNro = versionNro
 
    Set oDescriptions = new_Descriptions(entityCode, versionNro)

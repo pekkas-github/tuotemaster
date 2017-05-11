@@ -28,11 +28,11 @@ Private oOwners   As If_Owners
 
 '---- CONSTRUCTOR -------------------------------
 
-Public Sub init(categoryCode As String, namesBeh As If_Names, ownersBeh As If_Owners)
+Public Sub init(categoryCode As String, categoryType As String, namesBeh As If_Names, ownersBeh As If_Owners)
       
    Set oNames = namesBeh
    Set oOwners = ownersBeh
-   Set super = new_abs_Entity(categoryCode, "1.0")
+   Set super = new_abs_Entity(categoryCode, categoryType, "1.0")
    
 End Sub
 

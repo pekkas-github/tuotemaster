@@ -32,7 +32,7 @@ Public Sub init(productCode As String, versionNro As String, namesBeh As If_Name
    
    Set oNames = namesBeh
    Set oOwners = ownersBeh
-   Set super = new_abs_Entity(productCode, versionNro)
+   Set super = new_abs_Entity(productCode, "MR", versionNro)
       
 End Sub
 

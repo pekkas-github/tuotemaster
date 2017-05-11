@@ -60,7 +60,9 @@ Public Function createCategory(categoryType As String, parentCode As String) As 
    Set ownerBehavior = new_Owners_Self(categoryCode)
 
 '  Create, construct and save the new category/group
-   Set newCategory = new_Category(categoryCode, nameBehavior, ownerBehavior)
+'TODO: Kun uutta ryhm‰‰ ei viel‰ ole talletettu, newCategory-objektilta puuttuu
+'      type, koska objektin luonti yritt‰‰ hakea typen tietokannasta.
+   Set newCategory = new_Category(categoryCode, categoryType, nameBehavior, ownerBehavior)
    newCategory.isNew = True
    Me.save newCategory
 '  Create and save the version part of the product
@@ -85,15 +87,18 @@ Public Function getCategory(catCode As String) As dom_Category
 ' Return a persistent category.
 
    Dim retCategory      As dom_Category
+   Dim catType          As String
    Dim nameBehavior     As If_Names
    Dim ownerBehavior    As If_Owners
          
+   catType = app.Services.getEntityType(catCode)
+   
 '  Define name and owner behavior
    Set nameBehavior = new_Names_Unique(catCode)
    Set ownerBehavior = new_Owners_Self(catCode)
 
 '  Build a new category entity
-   Set retCategory = new_Category(catCode, nameBehavior, ownerBehavior)
+   Set retCategory = new_Category(catCode, catType, nameBehavior, ownerBehavior)
    retCategory.isNew = False
    
    Set getCategory = retCategory

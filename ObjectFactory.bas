@@ -37,11 +37,11 @@ Public Function new_abs_Entities() As abs_Entities
    
 End Function
 
-Public Function new_abs_Entity(entityCode As String, versionNro As String) As abs_Entity
+Public Function new_abs_Entity(entityCode As String, entityType As String, versionNro As String) As abs_Entity
 
    Dim newEntity  As New abs_Entity
    
-   Call newEntity.init(entityCode, versionNro)
+   Call newEntity.init(entityCode, entityType, versionNro)
    
    Set new_abs_Entity = newEntity
    Set newEntity = Nothing
@@ -121,11 +121,11 @@ Public Function new_Dba_Services() As Dba_Services
 End Function
 
 
-Public Function new_Category(categoryCode As String, namesBeh As If_Names, ownersBeh As If_Owners) As dom_Category
+Public Function new_Category(categoryCode As String, categoryType As String, namesBeh As If_Names, ownersBeh As If_Owners) As dom_Category
 
    Dim newCategory   As New dom_Category
    
-   newCategory.init categoryCode, namesBeh, ownersBeh
+   newCategory.init categoryCode, categoryType, namesBeh, ownersBeh
    
    Set new_Category = newCategory
    Set newCategory = Nothing

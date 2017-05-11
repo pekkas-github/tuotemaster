@@ -43,21 +43,24 @@ Public Function createDecision() As dom_Decision
    Dim newDecision   As dom_Decision
    Set rst = dba.getLastDecision(oEntityCode, oVersionNro)
 
-   'TODO: jos rst.EOF on true, niin silloin rst!ValidFrom antaa virheen!
-   If Not rst.EOF And rst!ValidFrom = Date Then ' Last decision starting today (-> edit current decision)
-      Set newDecision = new_Decision(False)     ' Mark decision "not new"
-      With newDecision
-         .setId (rst!id)
-         .setDecisionText (Nz(rst!DecisionText))
-         .setAuthority (Nz(rst!Authority))
-         .setStartDate (rst!ValidFrom)
-      End With
-      Set createDecision = newDecision
-      Set newDecision = Nothing
+   If rst.EOF Then
+      Set createDecision = new_Decision(True)      'No decisions (-> create new decision)
    Else
-      Set createDecision = new_Decision(True)   'No decisions or last decision starting earlier than today (-> create new decision)
+      If rst!ValidFrom = Date Then                 'Last decision starting today (-> edit current decision)
+         Set newDecision = new_Decision(False)     ' Mark decision "not new"
+         With newDecision
+            .setId (rst!id)
+            .setDecisionText (Nz(rst!DecisionText))
+            .setAuthority (Nz(rst!Authority))
+            .setStartDate (rst!ValidFrom)
+         End With
+         Set createDecision = newDecision
+         Set newDecision = Nothing
+      Else
+         Set createDecision = new_Decision(True)   'Last decision not today (-> create new decision)
+      End If
    End If
-        
+           
 End Function
 
 

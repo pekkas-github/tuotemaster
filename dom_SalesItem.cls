@@ -32,8 +32,7 @@ Public Sub init(salesItemCode As String, versionNro As String, namesBeh As If_Na
    
    Set oNames = namesBeh
    Set oOwners = ownersBeh
-   Set super = New abs_Entity
-   super.init salesItemCode, versionNro
+   Set super = new_abs_Entity(salesItemCode, "MN", versionNro)
          
 End Sub
 
